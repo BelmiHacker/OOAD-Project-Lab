@@ -9,6 +9,9 @@ import view.LoginView;
 import view.RegisterView;
 import view.CustomerProductListView;
 import view.CustomerProductDetailView;
+import view.CartView;
+import view.CourierListView;
+import view.CourierDetailView;
 
 /**
  * Main - Entry point aplikasi JoymarKet dengan Navigation Controller
@@ -19,6 +22,7 @@ public class Main extends Application implements NavigationListener {
     private String currentView = "ADMIN_LIST";
     private String currentAdminId = "ADM_00001";
     private String currentCustomerId = "CUST_00001";  // Will be set by login
+    private String currentCourierId = null;  // Will be set by login
     private String currentProductId = null;
     
     @Override
@@ -31,7 +35,7 @@ public class Main extends Application implements NavigationListener {
         primaryStage.setResizable(false);
         
         // Start with product list for admin (hardcoded adminId for testing)
-        navigateTo("CUSTOMER_LIST");
+        navigateTo("LOGIN");
         primaryStage.show();
     }
     
@@ -98,6 +102,40 @@ public class Main extends Application implements NavigationListener {
                     primaryStage.setWidth(800);
                     primaryStage.setHeight(700);
                     break;
+                    
+                case "CART":
+                    if (params.length > 0) {
+                        currentCustomerId = params[0];
+                        CartView cartView = new CartView(currentCustomerId);
+                        cartView.setNavigationListener(this);
+                        primaryStage.setScene(cartView.getScene());
+                        primaryStage.setWidth(1000);
+                        primaryStage.setHeight(700);
+                    }
+                    break;
+                    
+                case "COURIER_LIST":
+                    if (params.length > 0) {
+                        currentCourierId = params[0];
+                    }
+                    CourierListView courierListView = new CourierListView(currentCourierId);
+                    courierListView.setNavigationListener(this);
+                    primaryStage.setScene(courierListView.getScene());
+                    primaryStage.setWidth(1000);
+                    primaryStage.setHeight(700);
+                    break;
+                    
+                case "COURIER_DETAIL":
+                    if (params.length > 1) {
+                        String deliveryId = params[0];
+                        currentCourierId = params[1];
+                        CourierDetailView courierDetailView = new CourierDetailView(deliveryId, currentCourierId);
+                        courierDetailView.setNavigationListener(this);
+                        primaryStage.setScene(courierDetailView.getScene());
+                        primaryStage.setWidth(900);
+                        primaryStage.setHeight(700);
+                    }
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,9 +149,15 @@ public class Main extends Application implements NavigationListener {
             navigateTo("ADMIN_LIST");
         } else if ("CUSTOMER_DETAIL".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
+        } else if ("CART".equals(currentView)) {
+            navigateTo("CUSTOMER_LIST", currentCustomerId);
+        } else if ("COURIER_DETAIL".equals(currentView)) {
+            navigateTo("COURIER_LIST", currentCourierId);
         } else if ("REGISTER".equals(currentView)) {
             navigateTo("LOGIN");
         } else if ("CUSTOMER_LIST".equals(currentView)) {
+            navigateTo("LOGIN");
+        } else if ("COURIER_LIST".equals(currentView)) {
             navigateTo("LOGIN");
         }
     }

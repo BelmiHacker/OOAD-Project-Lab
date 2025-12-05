@@ -101,8 +101,13 @@ public class CustomerProductListView {
 			}
 		});
 		
-		Button cartBtn = new Button("Tambah ke Keranjang");
+		Button cartBtn = new Button("Buka Cart");
 		cartBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #FF9800; -fx-text-fill: white;");
+		cartBtn.setOnAction(e -> {
+			if (navigationListener != null) {
+				navigationListener.navigateTo("CART", customerId);
+			}
+		});
 		
 		buttonPanel.getChildren().addAll(detailBtn, cartBtn);
 		mainLayout.setBottom(buttonPanel);

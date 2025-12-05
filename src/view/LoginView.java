@@ -1,6 +1,7 @@
 package view;
 
 import controller.UserController;
+import controller.CustomerController;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -17,6 +18,7 @@ import javafx.scene.text.FontWeight;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import model.User;
+import model.Customer;
 
 /**
  * LoginView - JavaFX view untuk halaman login
@@ -37,6 +39,7 @@ public class LoginView {
 	private Button button;
 	
 	private UserController uc = new UserController();
+	private CustomerController cc = new CustomerController();
 	private User loggedInUser;
 	private NavigationListener navigationListener;
 	
@@ -100,6 +103,23 @@ public class LoginView {
 			if ("success".equals(result)) {
 				loggedInUser = uc.getUserByEmail(emailTF.getText());
 				showAlert("Sukses", "Login berhasil! Selamat datang " + loggedInUser.getFullName());
+				
+				// Navigate based on role
+				if (navigationListener != null) {
+					if ("admin".equals(loggedInUser.getRole())) {
+						navigationListener.navigateTo("ADMIN_LIST");
+					} else if ("customer".equals(loggedInUser.getRole())) {
+						// Get customer ID from user ID
+						Customer customer = cc.getCustomerByUserId(loggedInUser.getIdUser());
+						if (customer != null) {
+							navigationListener.navigateTo("CUSTOMER_LIST", customer.getIdCustomer());
+						} else {
+							showAlert("Error", "Customer data tidak ditemukan!");
+						}
+					} else if ("courier".equals(loggedInUser.getRole())) {
+						navigationListener.navigateTo("COURIER_LIST", loggedInUser.getIdUser());
+					}
+				}
 			} else {
 				showAlert("Error", result);
 			}
