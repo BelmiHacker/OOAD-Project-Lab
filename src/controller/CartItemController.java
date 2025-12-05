@@ -97,6 +97,15 @@ public class CartItemController {
     }
 
     /**
+     * Mendapatkan semua cart item
+     * 
+     * @return List of CartItem objects
+     */
+    public java.util.List<CartItem> getAllCartItems() {
+        return cartItemDAO.getAllCartItems();
+    }
+
+    /**
      * Hapus satu cart item
      * 
      * @param idCartItem ID cart item yang akan dihapus
