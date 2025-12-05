@@ -1,8 +1,34 @@
+# IDE Configuration Files
 .classpath
 .project
 .settings/
 .metadata/
+.vscode/
+.idea/
+*.iml
+
+# Build Output
 bin/
-*.class
-*.jar
 target/
+build/
+*.class
+*.log
+
+# Dependencies (Library files)
+*.jar
+*.dll
+*.so
+*.dylib
+lib/javafx-sdk-*/lib/
+lib/mysql-connector-*/
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE temp files
+*.tmp
+*.bak
