@@ -29,7 +29,6 @@ public class LoginView {
 	private BorderPane mainLayout;
 	private GridPane gridLayout;
 	
-	private Label title;
 	private Label emailLabel;
 	private Label passLabel;
 	
@@ -160,7 +159,6 @@ public class LoginView {
 		
 		emailLabel = new Label("Email:");
 		passLabel = new Label("Password:");
-		title = new Label("Login");
 		
 		mainLayout = new BorderPane();
 		gridLayout = new GridPane();

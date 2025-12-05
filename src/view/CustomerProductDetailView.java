@@ -41,7 +41,6 @@ public class CustomerProductDetailView {
 	private Label nameLabel;
 	private Label categoryLabel;
 	private Label priceLabel;
-	private Label descriptionLabel;
 	private Label stockLabel;
 	private Label quantityLabel;
 	
@@ -49,7 +48,6 @@ public class CustomerProductDetailView {
 	private Label nameValue;
 	private Label categoryValue;
 	private Label priceValue;
-	private Label descriptionValue;
 	private Label stockValue;
 	
 	private Spinner<Integer> quantitySpinner;
@@ -126,13 +124,6 @@ public class CustomerProductDetailView {
 		detailGrid.add(stockLabel, 0, 4);
 		detailGrid.add(stockValue, 1, 4);
 		
-		// Description Row
-		descriptionLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-		descriptionValue.setFont(Font.font("Arial", 12));
-		descriptionValue.setWrapText(true);
-		detailGrid.add(descriptionLabel, 0, 5);
-		detailGrid.add(descriptionValue, 1, 5);
-		
 		// Quantity Row
 		quantityLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 		detailGrid.add(quantityLabel, 0, 6);
@@ -143,12 +134,9 @@ public class CustomerProductDetailView {
 			idValue.setText(product.getIdProduct());
 			nameValue.setText(product.getName());
 			categoryValue.setText(product.getCategory());
-			priceValue.setText("Rp " + String.format("%.0f", product.getPrice()));
+			priceValue.setText("Rp " + String.format("%,d", (long)product.getPrice()));
 			stockValue.setText(String.valueOf(product.getStock()));
-			descriptionValue.setText("(No description available)");
-		}
-		
-		mainLayout.setCenter(detailGrid);
+		}		mainLayout.setCenter(detailGrid);
 		
 		// Button Panel
 		HBox buttonPanel = new HBox(10);
@@ -221,7 +209,6 @@ public class CustomerProductDetailView {
 		nameLabel = new Label("Nama Produk:");
 		categoryLabel = new Label("Kategori:");
 		priceLabel = new Label("Harga:");
-		descriptionLabel = new Label("Deskripsi:");
 		stockLabel = new Label("Stok:");
 		quantityLabel = new Label("Jumlah:");
 		
@@ -229,7 +216,6 @@ public class CustomerProductDetailView {
 		nameValue = new Label();
 		categoryValue = new Label();
 		priceValue = new Label();
-		descriptionValue = new Label();
 		stockValue = new Label();
 		
 		quantitySpinner = new Spinner<>();

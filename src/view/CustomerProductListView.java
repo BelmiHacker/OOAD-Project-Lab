@@ -1,8 +1,5 @@
 package view;
 
-import controller.UserController;
-import controller.CartItemController;
-import controller.CustomerController;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -34,9 +31,7 @@ public class CustomerProductListView {
 	private TextField searchField;
 	private TableView<Product> productTable;
 	
-	private UserController uc = new UserController();
 	private controller.ProductController pc = new controller.ProductController();
-	private CartItemController cartItemController = new CartItemController();
 	private String customerId;
 	private NavigationListener navigationListener;
 	
@@ -109,7 +104,23 @@ public class CustomerProductListView {
 			}
 		});
 		
-		buttonPanel.getChildren().addAll(detailBtn, cartBtn);
+		Button topUpBtn = new Button("Top Up Saldo");
+		topUpBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #9C27B0; -fx-text-fill: white;");
+		topUpBtn.setOnAction(e -> {
+			if (navigationListener != null) {
+				navigationListener.navigateTo("TOPUP", customerId);
+			}
+		});
+		
+		Button logoutBtn = new Button("Logout");
+		logoutBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #999999; -fx-text-fill: white;");
+		logoutBtn.setOnAction(e -> {
+			if (navigationListener != null) {
+				navigationListener.navigateTo("LOGIN");
+			}
+		});
+		
+		buttonPanel.getChildren().addAll(detailBtn, cartBtn, topUpBtn, logoutBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
 	
@@ -132,13 +143,26 @@ public class CustomerProductListView {
 		
 		TableColumn<Product, Double> priceCol = new TableColumn<>("Harga");
 		priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-		priceCol.setPrefWidth(100);
+		priceCol.setCellFactory(col -> new javafx.scene.control.TableCell<Product, Double>() {
+			@Override
+			protected void updateItem(Double price, boolean empty) {
+				super.updateItem(price, empty);
+				if (empty || price == null) {
+					setText(null);
+				} else {
+					setText("Rp " + String.format("%,d", (long)price.doubleValue()));
+				}
+			}
+		});
+		priceCol.setPrefWidth(120);
 		
 		TableColumn<Product, Integer> stockCol = new TableColumn<>("Stok");
 		stockCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
 		stockCol.setPrefWidth(100);
 		
-		productTable.getColumns().addAll(idCol, nameCol, categoryCol, priceCol, stockCol);
+		@SuppressWarnings("unchecked")
+		TableColumn<Product, ?>[] columns = new TableColumn[] {idCol, nameCol, categoryCol, priceCol, stockCol};
+		productTable.getColumns().addAll(columns);
 	}
 	
 	private void loadProducts() {

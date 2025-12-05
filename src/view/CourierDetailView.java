@@ -28,14 +28,12 @@ public class CourierDetailView {
 	private DeliveryController dc = new DeliveryController();
 	
 	private String deliveryId;
-	private String courierId;
 	private NavigationListener navigationListener;
 	
 	private Delivery delivery;
 	
 	public CourierDetailView(String deliveryId, String courierId) {
 		this.deliveryId = deliveryId;
-		this.courierId = courierId;
 		this.delivery = dc.getDeliveryById(deliveryId);
 		
 		init();

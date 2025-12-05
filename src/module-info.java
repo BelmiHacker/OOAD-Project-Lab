@@ -1,8 +1,9 @@
 module OOADLabProject {
 	requires transitive java.sql;
-	requires java.desktop;
-	requires javafx.controls;
-	requires javafx.graphics;
+	requires transitive java.desktop;
+	requires transitive javafx.controls;
+	requires transitive javafx.graphics;
+	requires transitive javafx.fxml;
 
 	exports model;
 	exports database;

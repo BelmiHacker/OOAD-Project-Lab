@@ -1,7 +1,6 @@
 package view;
 
 import controller.UserController;
-import controller.CustomerController;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -17,8 +16,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import model.User;
-import model.Customer;
 
 /**
  * RegisterView - JavaFX view untuk halaman registrasi pengguna baru
@@ -45,7 +42,6 @@ public class RegisterView {
 	private Button backBtn;
 	
 	private UserController uc = new UserController();
-	private CustomerController cc = new CustomerController();
 	private NavigationListener navigationListener;
 	
 	public RegisterView() {

@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import view.NavigationListener;
 import view.AdminProductListView;
 import view.AdminProductDetailView;
+import view.AdminOrderListView;
 import view.LoginView;
 import view.RegisterView;
 import view.CustomerProductListView;
@@ -12,6 +13,7 @@ import view.CustomerProductDetailView;
 import view.CartView;
 import view.CourierListView;
 import view.CourierDetailView;
+import view.TopUpView;
 
 /**
  * Main - Entry point aplikasi JoymarKet dengan Navigation Controller
@@ -136,6 +138,25 @@ public class Main extends Application implements NavigationListener {
                         primaryStage.setHeight(700);
                     }
                     break;
+                    
+                case "TOPUP":
+                    if (params.length > 0) {
+                        currentCustomerId = params[0];
+                        TopUpView topUpView = new TopUpView(currentCustomerId);
+                        topUpView.setNavigationListener(this);
+                        primaryStage.setScene(topUpView.getScene());
+                        primaryStage.setWidth(700);
+                        primaryStage.setHeight(500);
+                    }
+                    break;
+                    
+                case "ADMIN_ORDERS":
+                    AdminOrderListView adminOrderView = new AdminOrderListView(currentAdminId);
+                    adminOrderView.setNavigationListener(this);
+                    primaryStage.setScene(adminOrderView.getScene());
+                    primaryStage.setWidth(1100);
+                    primaryStage.setHeight(700);
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,9 +168,13 @@ public class Main extends Application implements NavigationListener {
         // Navigate based on current view
         if ("ADMIN_DETAIL".equals(currentView)) {
             navigateTo("ADMIN_LIST");
+        } else if ("ADMIN_ORDERS".equals(currentView)) {
+            navigateTo("ADMIN_LIST");
         } else if ("CUSTOMER_DETAIL".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
         } else if ("CART".equals(currentView)) {
+            navigateTo("CUSTOMER_LIST", currentCustomerId);
+        } else if ("TOPUP".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
         } else if ("COURIER_DETAIL".equals(currentView)) {
             navigateTo("COURIER_LIST", currentCourierId);

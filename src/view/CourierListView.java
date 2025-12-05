@@ -140,7 +140,9 @@ public class CourierListView {
 		dateCol.setCellValueFactory(new PropertyValueFactory<>("dateDelivery"));
 		dateCol.setPrefWidth(150);
 		
-		deliveryTable.getColumns().addAll(idCol, orderCol, courierCol, statusCol, addressCol, dateCol);
+		@SuppressWarnings("unchecked")
+		TableColumn<Delivery, ?>[] columns = new TableColumn[] {idCol, orderCol, courierCol, statusCol, addressCol, dateCol};
+		deliveryTable.getColumns().addAll(columns);
 	}
 	
 	private void loadDeliveries() {

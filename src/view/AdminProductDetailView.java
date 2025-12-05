@@ -5,7 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -32,7 +31,6 @@ public class AdminProductDetailView {
 	private NavigationListener navigationListener;
 
 	private String productId;
-	private String adminId;
 	private Product product;
 	private boolean isNew;
 
@@ -40,14 +38,12 @@ public class AdminProductDetailView {
 	private Label nameLabel;
 	private Label categoryLabel;
 	private Label priceLabel;
-	private Label descriptionLabel;
 	private Label stockLabel;
 
 	private TextField idField;
 	private TextField nameField;
 	private TextField categoryField;
 	private TextField priceField;
-	private TextArea descriptionArea;
 	private TextField stockField;
 
 	private Button saveBtn;
@@ -56,7 +52,6 @@ public class AdminProductDetailView {
 	// Constructor untuk edit/create produk
 	public AdminProductDetailView(String productId, String adminId) {
 		this.productId = productId;
-		this.adminId = adminId;
 		this.isNew = "NEW".equals(productId);
 		init();
 		if (!isNew) {
@@ -137,15 +132,6 @@ public class AdminProductDetailView {
 		detailGrid.add(stockLabel, 0, 4);
 		detailGrid.add(stockField, 1, 4);
 
-		// Description Row
-		descriptionLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-		descriptionArea.setPrefWidth(300);
-		descriptionArea.setPrefHeight(120);
-		descriptionArea.setStyle("-fx-font-size: 12; -fx-padding: 10;");
-		descriptionArea.setWrapText(true);
-		detailGrid.add(descriptionLabel, 0, 5);
-		detailGrid.add(descriptionArea, 1, 5);
-
 		// Populate values if editing
 		if (!isNew && product != null) {
 			idField.setText(product.getIdProduct());
@@ -153,7 +139,6 @@ public class AdminProductDetailView {
 			categoryField.setText(product.getCategory());
 			priceField.setText(String.valueOf(product.getPrice()));
 			stockField.setText(String.valueOf(product.getStock()));
-			descriptionArea.setText("(No description available)");
 		}
 
 		mainLayout.setCenter(detailGrid);
@@ -175,8 +160,7 @@ public class AdminProductDetailView {
 		saveBtn.setOnAction(e -> {
 			// Validate fields
 			if (idField.getText().isEmpty() || nameField.getText().isEmpty() || categoryField.getText().isEmpty()
-					|| priceField.getText().isEmpty() || stockField.getText().isEmpty()
-					|| descriptionArea.getText().isEmpty()) {
+					|| priceField.getText().isEmpty() || stockField.getText().isEmpty()) {
 				showAlert("Error", "Semua field harus diisi!");
 				return;
 			}
@@ -236,7 +220,6 @@ public class AdminProductDetailView {
 		nameLabel = new Label("Nama Produk:");
 		categoryLabel = new Label("Kategori:");
 		priceLabel = new Label("Harga:");
-		descriptionLabel = new Label("Deskripsi:");
 		stockLabel = new Label("Stok:");
 
 		idField = new TextField();
@@ -244,7 +227,6 @@ public class AdminProductDetailView {
 		categoryField = new TextField();
 		priceField = new TextField();
 		stockField = new TextField();
-		descriptionArea = new TextArea();
 
 		mainLayout = new BorderPane();
 		detailGrid = new GridPane();

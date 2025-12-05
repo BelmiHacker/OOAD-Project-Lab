@@ -161,7 +161,9 @@ public class CartView {
 		});
 		subtotalCol.setPrefWidth(120);
 		
-		cartTable.getColumns().addAll(idCol, productCol, qtyCol, priceCol, subtotalCol);
+		@SuppressWarnings("unchecked")
+		TableColumn<CartItem, ?>[] columns = new TableColumn[] {idCol, productCol, qtyCol, priceCol, subtotalCol};
+		cartTable.getColumns().addAll(columns);
 	}
 	
 	private void loadCartItems() {
