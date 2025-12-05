@@ -3,9 +3,12 @@ package view;
 import controller.CartItemController;
 import controller.ProductController;
 import controller.CustomerController;
+import controller.OrderController;
+import controller.PromoController;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -22,6 +25,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.CartItem;
 import model.Product;
+import model.Promo;
 import java.util.List;
 
 /**
@@ -36,12 +40,16 @@ public class CartView {
 	private CartItemController cic = new CartItemController();
 	private ProductController pc = new ProductController();
 	private CustomerController cc = new CustomerController();
+	private OrderController oc = new OrderController();
+	private PromoController promoC = new PromoController();
 	
 	private String customerId;
 	private NavigationListener navigationListener;
 	
 	private Label totalLabel;
 	private Label balanceLabel;
+	private Label discountLabel;
+	private ComboBox<Promo> promoCombo;
 	
 	public CartView(String customerId) {
 		this.customerId = customerId;
@@ -71,19 +79,55 @@ public class CartView {
 		setupTable();
 		mainLayout.setCenter(cartTable);
 		
-		// Footer Panel with Total
+		// Footer Panel with Total and Promo
 		HBox footerPanel = new HBox(20);
 		footerPanel.setPadding(new Insets(20));
 		footerPanel.setStyle("-fx-background-color: #f0f0f0;");
 		footerPanel.setAlignment(Pos.CENTER_RIGHT);
 		
+		VBox promoBox = new VBox(10);
+		promoBox.setAlignment(Pos.CENTER_LEFT);
+		promoBox.setPrefWidth(300);
+		
+		Label promoLabel = new Label("Pilih Promo (Opsional):");
+		promoLabel.setFont(Font.font("Arial", 11));
+		
+		promoCombo.setPrefWidth(250);
+		
+		// Load promos
+		List<Promo> promos = promoC.getAllPromos();
+		if (promos != null) {
+			ObservableList<Promo> promoList = FXCollections.observableArrayList(promos);
+			promoCombo.setItems(promoList);
+			promoCombo.setCellFactory(col -> new javafx.scene.control.ListCell<Promo>() {
+				@Override
+				protected void updateItem(Promo promo, boolean empty) {
+					super.updateItem(promo, empty);
+					setText(empty ? null : promo.getCode() + " - " + promo.getHeadline() + " (" + promo.getDiscountPercentage() + "%)");
+				}
+			});
+			promoCombo.setButtonCell(new javafx.scene.control.ListCell<Promo>() {
+				@Override
+				protected void updateItem(Promo promo, boolean empty) {
+					super.updateItem(promo, empty);
+					setText(empty ? null : promo.getCode() + " - " + promo.getHeadline() + " (" + promo.getDiscountPercentage() + "%)");
+				}
+			});
+			promoCombo.setOnAction(e -> updateTotalAndBalance());
+		}
+		
+		promoBox.getChildren().addAll(promoLabel, promoCombo);
+		footerPanel.getChildren().add(promoBox);
+		
 		VBox infoBox = new VBox(10);
 		infoBox.setAlignment(Pos.CENTER_RIGHT);
 		
 		balanceLabel.setFont(Font.font("Arial", 12));
+		discountLabel.setFont(Font.font("Arial", 11));
+		discountLabel.setTextFill(Color.web("#FF9800"));
 		totalLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 		
-		infoBox.getChildren().addAll(balanceLabel, totalLabel);
+		infoBox.getChildren().addAll(balanceLabel, discountLabel, totalLabel);
 		footerPanel.getChildren().add(infoBox);
 		
 		mainLayout.setBottom(footerPanel);
@@ -187,6 +231,7 @@ public class CartView {
 	private void updateTotalAndBalance() {
 		double balance = cc.getBalance(customerId);
 		double total = 0;
+		double discount = 0;
 		
 		// Calculate total from all items in table
 		for (CartItem item : cartTable.getItems()) {
@@ -196,7 +241,19 @@ public class CartView {
 			}
 		}
 		
+		// Apply promo if selected
+		Promo selectedPromo = promoCombo.getSelectionModel().getSelectedItem();
+		if (selectedPromo != null) {
+			discount = total * (selectedPromo.getDiscountPercentage() / 100.0);
+			total = total - discount;
+		}
+		
 		balanceLabel.setText("Saldo Anda: Rp " + String.format("%.0f", balance));
+		if (discount > 0) {
+			discountLabel.setText("Diskon: -Rp " + String.format("%.0f", discount));
+		} else {
+			discountLabel.setText("Diskon: Rp 0");
+		}
 		totalLabel.setText("Total Belanja: Rp " + String.format("%.0f", total));
 		
 		if (balance < total) {
@@ -207,28 +264,60 @@ public class CartView {
 	}
 	
 	private void checkout() {
+		List<CartItem> cartItems = cartTable.getItems();
+		
+		if (cartItems.isEmpty()) {
+			showAlert("Warning", "Keranjang belanja kosong!");
+			return;
+		}
+		
 		double balance = cc.getBalance(customerId);
 		double total = 0;
+		double discount = 0;
+		String idPromo = null;
 		
-		for (CartItem item : cartTable.getItems()) {
+		// Calculate total amount from cart items
+		for (CartItem item : cartItems) {
 			Product p = pc.getProductById(item.getIdProduct());
 			if (p != null) {
 				total += p.getPrice() * item.getCount();
 			}
 		}
 		
+		// Apply promo if selected
+		Promo selectedPromo = promoCombo.getSelectionModel().getSelectedItem();
+		if (selectedPromo != null) {
+			idPromo = selectedPromo.getIdPromo();
+			discount = total * (selectedPromo.getDiscountPercentage() / 100.0);
+			total = total - discount;
+		}
+		
+		// Check balance
 		if (balance < total) {
 			showAlert("Error", "Saldo tidak mencukupi! Silakan top-up terlebih dahulu.");
 			return;
 		}
 		
-		if (cartTable.getItems().isEmpty()) {
-			showAlert("Warning", "Keranjang belanja kosong!");
-			return;
-		}
+		// Generate order ID
+		String orderId = "ORD_" + System.currentTimeMillis();
 		
-		// TODO: Implement checkout logic in OrderController
-		showAlert("Info", "Fitur checkout belum diimplementasikan. Coming soon!");
+		// Checkout with promo
+		String result = oc.checkout(orderId, customerId, idPromo, total);
+		
+		if ("success".equals(result)) {
+			// Create order details for each cart item
+			for (CartItem item : cartItems) {
+				String orderDetailId = "ORDDET_" + System.currentTimeMillis() + "_" + item.getIdProduct();
+				oc.addOrderDetail(orderDetailId, orderId, item.getIdProduct(), item.getCount());
+			}
+			
+			showAlert("Success", "Checkout berhasil! Order ID: " + orderId);
+			cartTable.getItems().clear();
+			promoCombo.getSelectionModel().clearSelection();
+			updateTotalAndBalance();
+		} else {
+			showAlert("Error", "Checkout gagal: " + result);
+		}
 	}
 	
 	private void showAlert(String title, String message) {
@@ -251,5 +340,7 @@ public class CartView {
 		cartTable = new TableView<>();
 		totalLabel = new Label();
 		balanceLabel = new Label();
+		discountLabel = new Label();
+		promoCombo = new ComboBox<>();
 	}
 }
