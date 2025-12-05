@@ -1,9 +1,12 @@
 module OOADLabProject {
-	requires javafx.base;
-	requires javafx.graphics;
+	requires transitive java.sql;
+	requires java.desktop;
 	requires javafx.controls;
+	requires javafx.graphics;
 
-	
-	opens main to javafx.graphics;
+	exports model;
+	exports database;
 	exports main;
+	exports controller;
+	exports view;
 }

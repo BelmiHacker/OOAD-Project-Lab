@@ -1,4 +1,8 @@
-/bin/
-/out/
-/build/
-/target/
+.classpath
+.project
+.settings/
+.metadata/
+bin/
+*.class
+*.jar
+target/
