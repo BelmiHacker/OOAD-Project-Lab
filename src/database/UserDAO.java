@@ -26,14 +26,30 @@ public class UserDAO {
     }
 
     /**
-     * Generate unique ID untuk User
-     * Format: USER_XXXXX (diikuti dengan nomor urut)
+     * Generate unique ID untuk User dengan prefix sesuai role
+     * Format: USR_XXXXX (untuk customer), COUR_XXXXX (untuk courier), ADM_XXXXX (untuk admin)
      * 
+     * @param role Role user (customer, courier, admin)
      * @return String ID yang unik
      */
-    public String generateId() {
-        String sql = "SELECT MAX(CAST(SUBSTRING(idUser, 6) AS UNSIGNED)) as maxId FROM User";
+    public String generateId(String role) {
+        String prefix;
+        switch (role.toLowerCase()) {
+            case "courier":
+                prefix = "COUR";
+                break;
+            case "admin":
+                prefix = "ADM";
+                break;
+            case "customer":
+            default:
+                prefix = "USR";
+                break;
+        }
+        
+        String sql = "SELECT MAX(CAST(SUBSTRING(idUser, 6) AS UNSIGNED)) as maxId FROM User WHERE idUser LIKE ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, prefix + "%");
             ResultSet rs = ps.executeQuery();
             int nextId = 1;
             if (rs.next()) {
@@ -42,11 +58,21 @@ public class UserDAO {
                     nextId = maxId + 1;
                 }
             }
-            return String.format("USER_%05d", nextId);
+            return String.format("%s_%05d", prefix, nextId);
         } catch (SQLException e) {
             e.printStackTrace();
-            return "USER_00001";
+            return prefix + "_00001";
         }
+    }
+
+    /**
+     * Generate unique ID untuk User (default untuk backward compatibility)
+     * Format: USER_XXXXX
+     * 
+     * @return String ID yang unik
+     */
+    public String generateId() {
+        return generateId("customer");
     }
 
     /**

@@ -1,6 +1,7 @@
 package view;
 
 import controller.UserController;
+import controller.CustomerController;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -29,12 +30,14 @@ public class RegisterView {
 	private Label fullNameLabel;
 	private Label emailLabel;
 	private Label passLabel;
+	private Label confirmPassLabel;
 	private Label phoneLabel;
 	private Label addressLabel;
 	
 	private TextField fullNameTF;
 	private TextField emailTF;
 	private PasswordField passTF;
+	private PasswordField confirmPassTF;
 	private TextField phoneTF;
 	private TextField addressTF;
 	
@@ -42,6 +45,7 @@ public class RegisterView {
 	private Button backBtn;
 	
 	private UserController uc = new UserController();
+	private CustomerController cc = new CustomerController();
 	private NavigationListener navigationListener;
 	
 	public RegisterView() {
@@ -95,17 +99,23 @@ public class RegisterView {
 		gridLayout.add(passLabel, 0, 2);
 		gridLayout.add(passTF, 1, 2);
 		
+		// Confirm Password Row
+		confirmPassTF.setPrefWidth(300);
+		confirmPassTF.setStyle("-fx-font-size: 12; -fx-padding: 10;");
+		gridLayout.add(confirmPassLabel, 0, 3);
+		gridLayout.add(confirmPassTF, 1, 3);
+		
 		// Phone Row
 		phoneTF.setPrefWidth(300);
 		phoneTF.setStyle("-fx-font-size: 12; -fx-padding: 10;");
-		gridLayout.add(phoneLabel, 0, 3);
-		gridLayout.add(phoneTF, 1, 3);
+		gridLayout.add(phoneLabel, 0, 4);
+		gridLayout.add(phoneTF, 1, 4);
 		
 		// Address Row
 		addressTF.setPrefWidth(300);
 		addressTF.setStyle("-fx-font-size: 12; -fx-padding: 10;");
-		gridLayout.add(addressLabel, 0, 4);
-		gridLayout.add(addressTF, 1, 4);
+		gridLayout.add(addressLabel, 0, 5);
+		gridLayout.add(addressTF, 1, 5);
 		
 		// Button Row
 		HBox buttonBox = new HBox(10);
@@ -113,7 +123,7 @@ public class RegisterView {
 		registerBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #4CAF50; -fx-text-fill: white;");
 		backBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #999999; -fx-text-fill: white;");
 		buttonBox.getChildren().addAll(backBtn, registerBtn);
-		gridLayout.add(buttonBox, 0, 5, 2, 1);
+		gridLayout.add(buttonBox, 0, 6, 2, 1);
 		
 		mainLayout.setCenter(gridLayout);
 	}
@@ -123,19 +133,33 @@ public class RegisterView {
 			String fullName = fullNameTF.getText();
 			String email = emailTF.getText();
 			String password = passTF.getText();
+			String confirmPass = confirmPassTF.getText();
 			String phone = phoneTF.getText();
 			String address = addressTF.getText();
 			
 			// Validate fields
-			if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || phone.isEmpty() || address.isEmpty()) {
+			if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPass.isEmpty() || phone.isEmpty() || address.isEmpty()) {
 				showAlert("Error", "Semua field harus diisi!");
 				return;
 			}
 			
-			// Create User - register takes 7 parameters: idUser, fullName, email, password, confirmPassword, phone, address
-			String userResult = uc.register(email, fullName, email, password, password, phone, address);
+			// Generate ID for new user
+			String userId = uc.generateId("customer");
+			
+			// Create User
+			String userResult = uc.register(userId, fullName, email, password, confirmPass, phone, address);
 			if ("success".equals(userResult)) {
-				showAlert("Sukses", "Registrasi berhasil! Silakan login.");
+				// Create Customer with initial balance 0
+				String customerId = cc.generateId();
+				String custResult = cc.createCustomer(customerId, userId, 0);
+				if ("success".equals(custResult)) {
+					showAlert("Sukses", "Registrasi berhasil! Silakan login.");
+					if (navigationListener != null) {
+						navigationListener.goBack();
+					}
+				} else {
+					showAlert("Error", "Gagal membuat akun customer: " + custResult);
+				}
 			} else {
 				showAlert("Error", userResult);
 			}
@@ -170,12 +194,14 @@ public class RegisterView {
 		fullNameTF = new TextField();
 		emailTF = new TextField();
 		passTF = new PasswordField();
+		confirmPassTF = new PasswordField();
 		phoneTF = new TextField();
 		addressTF = new TextField();
 		
 		fullNameLabel = new Label("Nama Lengkap:");
 		emailLabel = new Label("Email:");
 		passLabel = new Label("Password:");
+		confirmPassLabel = new Label("Konfirmasi Password:");
 		phoneLabel = new Label("Nomor HP:");
 		addressLabel = new Label("Alamat:");
 		
