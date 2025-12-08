@@ -100,23 +100,6 @@ public class AdminProductListView {
 			}
 		});
 		
-//		Button deleteBtn = new Button("Hapus");
-//		deleteBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #FF5252; -fx-text-fill: white;");
-//		deleteBtn.setOnAction(e -> {
-//			Product selected = productTable.getSelectionModel().getSelectedItem();
-//			if (selected != null) {
-//				// delete product
-//				String result = pc.deleteProduct(selected.getIdProduct());
-//				if (result.equals("success")) {
-//					showAlert("Success", "Produk berhasil dihapus.");
-//					loadProducts();
-//				}
-//			} else {
-//				showAlert("Warning", "Pilih produk terlebih dahulu!");
-//			}
-//		});
-		
-		
 		Button ordersBtn = new Button("Kelola Order");
 		ordersBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #FF9800; -fx-text-fill: white;");
 		ordersBtn.setOnAction(e -> {
