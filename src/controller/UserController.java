@@ -1,5 +1,6 @@
 package controller;
 
+import model.Customer;
 import model.User;
 import database.UserDAO;
 
@@ -207,5 +208,40 @@ public class UserController {
      */
     public User getUserByEmail(String email) {
         return userDAO.getUserByEmail(email);
+    }
+
+    /**
+     * Generate ID user dengan prefix sesuai role
+     * Format: USR_XXXXX, COUR_XXXXX, CUST_XXXXX, ADM_XXXXX
+     * 
+     * @param role Role user (customer, courier, admin)
+     * @return Generated user ID
+     */
+    public String generateId(String role) {
+        return userDAO.generateId(role);
+    }
+
+    /**
+     * Update role user
+     * 
+     * @param idUser ID user yang akan di-update
+     * @param newRole Role baru (customer, courier, admin)
+     * @return "success" jika berhasil, pesan error sebaliknya
+     */
+    public String updateRole(String idUser, String newRole) {
+        if (idUser == null || idUser.isEmpty()) {
+            return "User ID tidak boleh kosong";
+        }
+
+        User user = userDAO.getUserById(idUser);
+        if (user == null) {
+            return "User tidak ditemukan";
+        }
+
+        user.setRole(newRole);
+        if (userDAO.updateUser(user)) {
+            return "success";
+        }
+        return "Gagal update role user";
     }
 }

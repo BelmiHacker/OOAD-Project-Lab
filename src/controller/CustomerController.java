@@ -111,4 +111,27 @@ public class CustomerController {
         }
         return "Tambah customer gagal";
     }
+
+    /**
+     * Generate unique ID untuk Customer
+     * Format: CUST_XXXXX
+     * 
+     * @return String ID yang unik
+     */
+    public String generateId() {
+        return customerDAO.generateId();
+    }
+
+    /**
+     * Create customer baru dengan balance awal
+     * 
+     * @param idCustomer ID customer baru
+     * @param idUser ID user yang berelasi
+     * @param initialBalance Saldo awal customer
+     * @return "success" jika berhasil, pesan error sebaliknya
+     */
+    public String createCustomer(String idCustomer, String idUser, double initialBalance) {
+        Customer customer = new Customer(idCustomer, idUser, initialBalance);
+        return insertCustomer(customer);
+    }
 }
