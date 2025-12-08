@@ -188,7 +188,7 @@ public class CustomerProductDetailView {
 				showAlert("Sukses", "Produk berhasil ditambahkan ke keranjang!");
 				quantitySpinner.getValueFactory().setValue(1);
 			} else {
-				showAlert("Error", "Gagal menambahkan ke keranjang: " + result);
+				showAlert("Error", result);
 			}
 		});
 		

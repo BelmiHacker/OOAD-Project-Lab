@@ -107,7 +107,7 @@ public class Main extends Application implements NavigationListener {
                         CartView cartView = new CartView(currentCustomerId);
                         cartView.setNavigationListener(this);
                         primaryStage.setScene(cartView.getScene());
-                        primaryStage.setWidth(1000);
+                        primaryStage.setWidth(900);
                         primaryStage.setHeight(700);
                     }
                     break;
@@ -160,7 +160,7 @@ public class Main extends Application implements NavigationListener {
                         ProfileView profileView = new ProfileView(currentUserId);
                         profileView.setNavigationListener(this);
                         primaryStage.setScene(profileView.getScene());
-                        primaryStage.setWidth(700);
+                        primaryStage.setWidth(900);
                         primaryStage.setHeight(700);
                     }
                     break;

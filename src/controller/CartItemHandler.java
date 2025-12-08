@@ -38,18 +38,38 @@ public class CartItemHandler {
             return "Jumlah harus lebih dari 0";
         }
 
-        int availableStock = productDAO.getStock(idProduct);
-        if (count > availableStock) {
-            return "Jumlah melebihi stok yang tersedia";
+        // Check existing cart item for this customer (single-item cart)
+        CartItem existing = getCartItems(idCustomer);
+        if (existing != null) {
+            if (!existing.getIdProduct().equals(idProduct)) {
+                // Different product already in cart -> instruct user to remove it first
+                return "Keranjang berisi produk lain. Hapus item di cart terlebih dahulu untuk menambahkan produk lain.";
+            } else {
+                // Same product: merge counts (with stock validation) and update
+                int availableStock = productDAO.getStock(idProduct);
+                int newCount = existing.getCount() + count;
+                if (newCount > availableStock) {
+                    return "Jumlah melebihi stok yang tersedia";
+                }
+                if (cartItemDAO.updateCount(idCustomer, idProduct, newCount)) {
+                    return "success";
+                }
+                return "Tambah ke cart gagal";
+            }
         }
 
-        CartItem cartItem = new CartItem("CART_" + System.currentTimeMillis(), idCustomer, idProduct, count);
-        if (cartItemDAO.insertCartItem(cartItem)) {
-            return "success";
-        }
-        return "Tambah ke cart gagal";
+    // No existing item -> normal insert flow
+    int availableStock = productDAO.getStock(idProduct);
+    if (count > availableStock) {
+        return "Jumlah melebihi stok yang tersedia";
     }
 
+    CartItem cartItem = new CartItem("CART_" + System.currentTimeMillis(), idCustomer, idProduct, count);
+    if (cartItemDAO.insertCartItem(cartItem)) {
+        return "success";
+    }
+    return "Tambah ke cart gagal";
+}
     /**
      * Update jumlah produk dalam cart item
      * Validasi memastikan jumlah valid dan stok tersedia
