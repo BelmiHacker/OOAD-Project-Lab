@@ -210,6 +210,16 @@ public class UserHandler {
     }
 
     /**
+     * Mendapatkan user berdasarkan ID customer
+     *
+     * @param idCustomer ID customer yang dicari
+     * @return User object jika ditemukan, null sebaliknya
+     */
+    public User getUserByCustomerId(String idCustomer) {
+        return userDAO.getUserByCustomerId(idCustomer);
+    }
+
+    /**
      * Generate ID user dengan prefix sesuai role
      * Format: USR_XXXXX, COUR_XXXXX, CUST_XXXXX, ADM_XXXXX
      * 

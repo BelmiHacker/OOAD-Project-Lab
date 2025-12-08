@@ -166,15 +166,17 @@ public class CartItemDAO {
     /**
      * Update count dari CartItem di database
      *
-     * @param idCartItem ID dari CartItem yang akan diupdate
+     * @param idCustomer ID Customer dari CartItem yang akan diupdate
+     * @param idProduct ID Product dari CartItem yang akan diupdate
      * @param newCount nilai count baru
      * @return boolean true jika berhasil, false jika gagal
      */
-    public boolean updateCount(String idCartItem, int newCount) {
-        String sql = "UPDATE CartItem SET count = ? WHERE idCartItem = ?";
+    public boolean updateCount(String idCustomer, String idProduct, int newCount) {
+        String sql = "UPDATE CartItem SET count = ? WHERE idCustomer = ? AND idProduct = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, newCount);
-            ps.setString(2, idCartItem);
+            ps.setString(2, idCustomer);
+            ps.setString(3, idProduct);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

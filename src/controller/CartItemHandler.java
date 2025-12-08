@@ -53,13 +53,13 @@ public class CartItemHandler {
     /**
      * Update jumlah produk dalam cart item
      * Validasi memastikan jumlah valid dan stok tersedia
-     * 
-     * @param idCartItem ID cart item yang akan diupdate
+     *
+     * @param idCustomer ID customer yang mengedit cart
      * @param newCount Jumlah baru
      * @param idProduct ID produk di cart item
      * @return "success" jika berhasil, pesan error sebaliknya
      */
-    public String updateCartItemCount(String idCartItem, int newCount, String idProduct) {
+    public String editCartItem(String idCustomer, String idProduct, int newCount) {
         if (newCount <= 0) {
             return "Jumlah harus lebih dari 0";
         }
@@ -69,7 +69,7 @@ public class CartItemHandler {
             return "Jumlah melebihi stok yang tersedia";
         }
 
-        if (cartItemDAO.updateCount(idCartItem, newCount)) {
+        if (cartItemDAO.updateCount(idCustomer, idProduct, newCount)) {
             return "success";
         }
         return "Update cart gagal";

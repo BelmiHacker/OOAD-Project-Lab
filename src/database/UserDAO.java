@@ -127,6 +127,34 @@ public class UserDAO {
     }
 
     /**
+     * Get user by Customer ID
+     *
+     * @param idCustomer ID customer yang dicari
+     * @return User object jika ditemukan, null jika tidak ditemukan
+     */
+    public User getUserByCustomerId(String idCustomer) {
+        String sql = "SELECT u.* FROM User u JOIN Customer c ON u.idUser = c.idUser WHERE c.idCustomer = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, idCustomer);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new User(
+                        rs.getString("idUser"),
+                        rs.getString("fullName"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("phone"),
+                        rs.getString("address"),
+                        rs.getString("role")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * Get user by Email
      *
      * @param email Email user yang dicari

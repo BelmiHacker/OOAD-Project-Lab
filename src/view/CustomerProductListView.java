@@ -1,6 +1,7 @@
 package view;
 
 import controller.ProductHandler;
+import controller.UserHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -20,6 +21,8 @@ import javafx.scene.text.FontWeight;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Product;
+import model.User;
+
 import java.util.List;
 
 /**
@@ -34,7 +37,9 @@ public class CustomerProductListView {
 
 	// Handlers
 	private ProductHandler pc = new ProductHandler();
+	private UserHandler uc = new UserHandler();
 	private String customerId;
+	private String userId;
 	private NavigationListener navigationListener;
 
 	// Constructor
@@ -43,6 +48,7 @@ public class CustomerProductListView {
 		init();
 		setupLayout();
 		loadProducts();
+		loadUser();
 		
 		scene = new Scene(mainLayout, 1000, 700);
 	}
@@ -117,6 +123,14 @@ public class CustomerProductListView {
 				navigationListener.navigateTo("TOPUP", customerId);
 			}
 		});
+
+		Button editProfileBtn = new Button("Edit Profile");
+		editProfileBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #4CAF50; -fx-text-fill: white;");
+		editProfileBtn.setOnAction(e -> {
+			if (navigationListener != null) {
+				navigationListener.navigateTo("EDIT_PROFILE", userId);
+			}
+		});
 		
 		Button logoutBtn = new Button("Logout");
 		logoutBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #999999; -fx-text-fill: white;");
@@ -126,7 +140,7 @@ public class CustomerProductListView {
 			}
 		});
 		
-		buttonPanel.getChildren().addAll(detailBtn, cartBtn, topUpBtn, logoutBtn);
+		buttonPanel.getChildren().addAll(detailBtn, cartBtn, topUpBtn, editProfileBtn, logoutBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
 
@@ -185,6 +199,16 @@ public class CustomerProductListView {
 		if (products != null) {
 			ObservableList<Product> items = FXCollections.observableArrayList(products);
 			productTable.setItems(items);
+		}
+	}
+
+	/**
+	 * Load data user customer
+	 */
+	private void loadUser() {
+		User user = uc.getUserByCustomerId(customerId);
+		if (user != null) {
+			this.userId = user.getIdUser();
 		}
 	}
 

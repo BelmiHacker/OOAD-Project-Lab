@@ -28,15 +28,15 @@ public class ProductHandler {
      * Validasi memastikan stok tidak negatif
      * 
      * @param idProduct ID produk yang stoknya akan diupdate
-     * @param newStock Nilai stok baru
+     * @param stock Nilai stok baru
      * @return "success" jika update berhasil, pesan error sebaliknya
      */
-    public String updateStock(String idProduct, int newStock) {
-        if (newStock < 0) {
+    public String editProductStock(String idProduct, int stock) {
+        if (stock < 0) {
             return "Stok tidak boleh negatif";
         }
 
-        if (productDAO.updateStock(idProduct, newStock)) {
+        if (productDAO.updateStock(idProduct, stock)) {
             return "success";
         }
         return "Update stok gagal";
@@ -124,23 +124,5 @@ public class ProductHandler {
             return "success";
         }
         return "Update produk gagal";
-    }
-
-    /**
-     * Edit stok produk
-     * Validasi memastikan stok tidak negatif
-     *
-     * @param idProduct ID produk yang stoknya akan diedit
-     * @param stock Nilai stok baru
-     * @return "success" jika edit berhasil, pesan error sebaliknya
-     */
-    public String editProductStock(String idProduct, int stock) {
-        if (stock < 0) {
-            return "Stok tidak boleh negatif";
-        }
-        if (productDAO.updateStock(idProduct, stock)) {
-            return "success";
-        }
-        return "Update stok gagal";
     }
 }
