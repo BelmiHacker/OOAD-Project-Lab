@@ -19,14 +19,17 @@ import view.TopUpView;
  * Main - Entry point aplikasi JoymarKet dengan Navigation Controller
  */
 public class Main extends Application implements NavigationListener {
-    
+    // State aplikasi saat ini
     private Stage primaryStage;
     private String currentView = "ADMIN_LIST";
     private String currentAdminId = "ADM_00001";
     private String currentCustomerId = "CUST_00001";  // Will be set by login
     private String currentCourierId = null;  // Will be set by login
     private String currentProductId = null;
-    
+
+    /**
+     * Memulai aplikasi dan menampilkan jendela utama
+     */
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -40,7 +43,10 @@ public class Main extends Application implements NavigationListener {
         navigateTo("LOGIN");
         primaryStage.show();
     }
-    
+
+    /**
+     * Menavigasi ke tampilan yang ditentukan
+     */
     @Override
     public void navigateTo(String viewName, String... params) {
         try {
@@ -162,7 +168,10 @@ public class Main extends Application implements NavigationListener {
             e.printStackTrace();
         }
     }
-    
+
+    /**
+     * Menavigasi kembali ke tampilan sebelumnya berdasarkan konteks saat ini
+     */
     @Override
     public void goBack() {
         // Navigate based on current view
@@ -186,7 +195,10 @@ public class Main extends Application implements NavigationListener {
             navigateTo("LOGIN");
         }
     }
-    
+
+    /**
+     * Metode utama untuk menjalankan aplikasi
+     */
     public static void main(String[] args) {
         launch(args);
     }

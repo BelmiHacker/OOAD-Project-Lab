@@ -49,6 +49,12 @@ public class CourierDAO {
         }
     }
 
+    /**
+     * Insert Courier baru ke database
+     *
+     * @param courier Courier object yang akan disimpan
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean insertCourier(Courier courier) {
         String sql = "INSERT INTO Courier (idCourier, idUser, vehicleType, vehiclePlate) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -63,6 +69,12 @@ public class CourierDAO {
         }
     }
 
+    /**
+     * Mendapatkan Courier berdasarkan idCourier
+     *
+     * @param idCourier ID Courier yang dicari
+     * @return Courier object jika ditemukan, null jika tidak ditemukan
+     */
     public Courier getCourierById(String idCourier) {
         String sql = "SELECT * FROM Courier WHERE idCourier = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -82,6 +94,12 @@ public class CourierDAO {
         return null;
     }
 
+    /**
+     * Mendapatkan Courier berdasarkan idUser
+     *
+     * @param idUser ID User yang dicari
+     * @return Courier object jika ditemukan, null jika tidak ditemukan
+     */
     public Courier getCourierByUserId(String idUser) {
         String sql = "SELECT * FROM Courier WHERE idUser = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -101,6 +119,11 @@ public class CourierDAO {
         return null;
     }
 
+    /**
+     * Mendapatkan semua Courier dari database
+     *
+     * @return List<Courier> daftar semua Courier
+     */
     public List<Courier> getAllCouriers() {
         List<Courier> couriers = new ArrayList<>();
         String sql = "SELECT * FROM Courier";
@@ -120,6 +143,12 @@ public class CourierDAO {
         return couriers;
     }
 
+    /**
+     * Update data Courier di database
+     *
+     * @param courier Courier object dengan data yang sudah diperbarui
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean updateCourier(Courier courier) {
         String sql = "UPDATE Courier SET idUser = ?, vehicleType = ?, vehiclePlate = ? WHERE idCourier = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -134,6 +163,12 @@ public class CourierDAO {
         }
     }
 
+    /**
+     * Delete Courier dari database
+     *
+     * @param idCourier ID Courier yang akan dihapus
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean deleteCourier(String idCourier) {
         String sql = "DELETE FROM Courier WHERE idCourier = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

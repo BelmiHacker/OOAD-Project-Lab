@@ -49,6 +49,12 @@ public class OrderDetailDAO {
         }
     }
 
+    /**
+     * Insert OrderDetail baru ke database
+     *
+     * @param orderDetail OrderDetail object yang akan disimpan
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean insertOrderDetail(OrderDetail orderDetail) {
         String sql = "INSERT INTO OrderDetail (idOrderDetail, idOrder, idProduct, qty) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -63,6 +69,12 @@ public class OrderDetailDAO {
         }
     }
 
+    /**
+     * Mendapatkan OrderDetail berdasarkan ID
+     *
+     * @param idOrderDetail ID dari OrderDetail yang dicari
+     * @return OrderDetail object jika ditemukan, null jika tidak ditemukan
+     */
     public OrderDetail getOrderDetailById(String idOrderDetail) {
         String sql = "SELECT * FROM OrderDetail WHERE idOrderDetail = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -82,6 +94,12 @@ public class OrderDetailDAO {
         return null;
     }
 
+    /**
+     * Mendapatkan semua OrderDetail berdasarkan ID Order
+     *
+     * @param idOrder ID dari Order yang dicari
+     * @return List<OrderDetail> daftar OrderDetail yang terkait dengan ID Order
+     */
     public List<OrderDetail> getOrderDetailsByOrderId(String idOrder) {
         List<OrderDetail> orderDetails = new ArrayList<>();
         String sql = "SELECT * FROM OrderDetail WHERE idOrder = ?";
@@ -102,6 +120,11 @@ public class OrderDetailDAO {
         return orderDetails;
     }
 
+    /**
+     * Mendapatkan semua OrderDetail dari database
+     *
+     * @return List<OrderDetail> daftar semua OrderDetail
+     */
     public List<OrderDetail> getAllOrderDetails() {
         List<OrderDetail> orderDetails = new ArrayList<>();
         String sql = "SELECT * FROM OrderDetail";
@@ -121,6 +144,12 @@ public class OrderDetailDAO {
         return orderDetails;
     }
 
+    /**
+     * Update OrderDetail di database
+     *
+     * @param orderDetail OrderDetail object yang akan diupdate
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean updateOrderDetail(OrderDetail orderDetail) {
         String sql = "UPDATE OrderDetail SET idOrder = ?, idProduct = ?, qty = ? WHERE idOrderDetail = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -135,6 +164,12 @@ public class OrderDetailDAO {
         }
     }
 
+    /**
+     * Delete OrderDetail dari database berdasarkan ID
+     *
+     * @param idOrderDetail ID dari OrderDetail yang akan dihapus
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean deleteOrderDetail(String idOrderDetail) {
         String sql = "DELETE FROM OrderDetail WHERE idOrderDetail = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -146,6 +181,12 @@ public class OrderDetailDAO {
         }
     }
 
+    /**
+     * Delete semua OrderDetail dari database berdasarkan ID Order
+     *
+     * @param idOrder ID dari Order yang OrderDetail-nya akan dihapus
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean deleteOrderDetailByOrderId(String idOrder) {
         String sql = "DELETE FROM OrderDetail WHERE idOrder = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

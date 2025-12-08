@@ -49,6 +49,12 @@ public class DeliveryDAO {
         }
     }
 
+    /**
+     * Insert Delivery baru ke database
+     *
+     * @param delivery Delivery object yang akan disimpan
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean insertDelivery(Delivery delivery) {
         String sql = "INSERT INTO Delivery (idDelivery, idOrder, idCourier, status) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -63,6 +69,12 @@ public class DeliveryDAO {
         }
     }
 
+    /**
+     * Mendapatkan Delivery berdasarkan idDelivery
+     *
+     * @param idDelivery ID dari Delivery yang dicari
+     * @return Delivery object jika ditemukan, null jika tidak ditemukan
+     */
     public Delivery getDeliveryById(String idDelivery) {
         String sql = "SELECT * FROM Delivery WHERE idDelivery = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -82,6 +94,12 @@ public class DeliveryDAO {
         return null;
     }
 
+    /**
+     * Mendapatkan Delivery berdasarkan idOrder
+     *
+     * @param idOrder ID dari Order yang dicari
+     * @return Delivery object jika ditemukan, null jika tidak ditemukan
+     */
     public Delivery getDeliveryByOrderId(String idOrder) {
         String sql = "SELECT * FROM Delivery WHERE idOrder = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -101,6 +119,12 @@ public class DeliveryDAO {
         return null;
     }
 
+    /**
+     * Mendapatkan semua Delivery berdasarkan idCourier
+     *
+     * @param idCourier ID dari Courier yang dicari
+     * @return List<Delivery> daftar Delivery yang ditemukan
+     */
     public List<Delivery> getDeliveriesByCourierId(String idCourier) {
         List<Delivery> deliveries = new ArrayList<>();
         String sql = "SELECT * FROM Delivery WHERE idCourier = ?";
@@ -121,6 +145,11 @@ public class DeliveryDAO {
         return deliveries;
     }
 
+    /**
+     * Mendapatkan semua Delivery dari database
+     *
+     * @return List<Delivery> daftar semua Delivery
+     */
     public List<Delivery> getAllDeliveries() {
         List<Delivery> deliveries = new ArrayList<>();
         String sql = "SELECT * FROM Delivery";
@@ -140,6 +169,12 @@ public class DeliveryDAO {
         return deliveries;
     }
 
+    /**
+     * Update data Delivery di database
+     *
+     * @param delivery Delivery object yang akan diupdate
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean updateDelivery(Delivery delivery) {
         String sql = "UPDATE Delivery SET idOrder = ?, idCourier = ?, status = ? WHERE idDelivery = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

@@ -51,6 +51,12 @@ public class OrderHeaderDAO {
         }
     }
 
+    /**
+     * Insert OrderHeader baru ke database
+     *
+     * @param orderHeader OrderHeader object yang akan disimpan
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean insertOrderHeader(OrderHeader orderHeader) {
         String sql = "INSERT INTO OrderHeader (idOrder, idCustomer, idPromo, status, orderedAt, totalAmount) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -67,6 +73,13 @@ public class OrderHeaderDAO {
         }
     }
 
+    /**
+     * Mendapatkan OrderHeader berdasarkan idOrder dan idCustomer
+     *
+     * @param idOrder ID Order yang dicari
+     * @param idCustomer ID Customer yang dicari
+     * @return OrderHeader object jika ditemukan, null jika tidak ditemukan
+     */
     public OrderHeader getOrderHeaderById(String idOrder, String idCustomer) {
         String sql = "SELECT * FROM OrderHeader WHERE idOrder = ? AND idCustomer = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -89,6 +102,12 @@ public class OrderHeaderDAO {
         return null;
     }
 
+    /**
+     * Mendapatkan semua OrderHeader berdasarkan idCustomer
+     *
+     * @param idCustomer ID Customer yang dicari
+     * @return List<OrderHeader> daftar OrderHeader yang ditemukan
+     */
     public List<OrderHeader> getOrderHeadersByCustomerId(String idCustomer) {
         List<OrderHeader> orders = new ArrayList<>();
         String sql = "SELECT * FROM OrderHeader WHERE idCustomer = ?";
@@ -111,6 +130,11 @@ public class OrderHeaderDAO {
         return orders;
     }
 
+    /**
+     * Mendapatkan semua OrderHeader dari database
+     *
+     * @return List<OrderHeader> daftar semua OrderHeader
+     */
     public List<OrderHeader> getAllOrderHeaders() {
         List<OrderHeader> orders = new ArrayList<>();
         String sql = "SELECT * FROM OrderHeader";
@@ -132,6 +156,12 @@ public class OrderHeaderDAO {
         return orders;
     }
 
+    /**
+     * Update data OrderHeader di database
+     *
+     * @param orderHeader OrderHeader object yang akan diupdate
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean updateOrderHeader(OrderHeader orderHeader) {
         String sql = "UPDATE OrderHeader SET idCustomer = ?, idPromo = ?, status = ?, orderedAt = ?, totalAmount = ? WHERE idOrder = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -148,6 +178,13 @@ public class OrderHeaderDAO {
         }
     }
 
+    /**
+     * Update status OrderHeader di database
+     *
+     * @param idOrder ID Order yang akan diupdate
+     * @param status status baru
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean updateOrderStatus(String idOrder, String status) {
         String sql = "UPDATE OrderHeader SET status = ? WHERE idOrder = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -160,6 +197,12 @@ public class OrderHeaderDAO {
         }
     }
 
+    /**
+     * Delete OrderHeader dari database
+     *
+     * @param idOrder ID Order yang akan dihapus
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean deleteOrderHeader(String idOrder) {
         String sql = "DELETE FROM OrderHeader WHERE idOrder = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -171,6 +214,12 @@ public class OrderHeaderDAO {
         }
     }
 
+    /**
+     * Mendapatkan semua OrderHeader berdasarkan status
+     *
+     * @param status status yang dicari
+     * @return List<OrderHeader> daftar OrderHeader yang ditemukan
+     */
     public List<OrderHeader> getOrderHeadersByStatus(String status) {
         List<OrderHeader> orders = new ArrayList<>();
         String sql = "SELECT * FROM OrderHeader WHERE status = ?";

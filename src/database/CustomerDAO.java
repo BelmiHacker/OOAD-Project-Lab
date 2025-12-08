@@ -49,6 +49,12 @@ public class CustomerDAO {
         }
     }
 
+    /**
+     * Insert Customer baru ke database
+     *
+     * @param customer Customer object yang akan disimpan
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean insertCustomer(Customer customer) {
         String sql = "INSERT INTO Customer (idCustomer, idUser, balance) VALUES (?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -62,6 +68,12 @@ public class CustomerDAO {
         }
     }
 
+    /**
+     * Mengambil data Customer berdasarkan idCustomer
+     *
+     * @param idCustomer ID Customer yang dicari
+     * @return Customer object jika ditemukan, null jika tidak ditemukan
+     */
     public Customer getCustomerById(String idCustomer) {
         String sql = "SELECT * FROM Customer WHERE idCustomer = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -80,6 +92,12 @@ public class CustomerDAO {
         return null;
     }
 
+    /**
+     * Mengambil data Customer berdasarkan idUser
+     *
+     * @param idUser ID User yang dicari
+     * @return Customer object jika ditemukan, null jika tidak ditemukan
+     */
     public Customer getCustomerByUserId(String idUser) {
         String sql = "SELECT * FROM Customer WHERE idUser = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -98,6 +116,11 @@ public class CustomerDAO {
         return null;
     }
 
+    /**
+     * Mengambil semua data Customer dari database
+     *
+     * @return List<Customer> daftar semua Customer
+     */
     public List<Customer> getAllCustomers() {
         List<Customer> customers = new ArrayList<>();
         String sql = "SELECT * FROM Customer";
@@ -116,6 +139,12 @@ public class CustomerDAO {
         return customers;
     }
 
+    /**
+     * Update data Customer di database
+     *
+     * @param customer Customer object yang akan diupdate
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean updateCustomer(Customer customer) {
         String sql = "UPDATE Customer SET idUser = ?, balance = ? WHERE idCustomer = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -129,6 +158,12 @@ public class CustomerDAO {
         }
     }
 
+    /**
+     * Delete Customer dari database berdasarkan idCustomer
+     *
+     * @param idCustomer ID Customer yang akan dihapus
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean deleteCustomer(String idCustomer) {
         String sql = "DELETE FROM Customer WHERE idCustomer = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -140,6 +175,13 @@ public class CustomerDAO {
         }
     }
 
+    /**
+     * Menambahkan saldo ke Customer
+     *
+     * @param idCustomer ID Customer yang akan ditambahkan saldo
+     * @param amount Jumlah saldo yang akan ditambahkan
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean topUpBalance(String idCustomer, double amount) {
         String sql = "UPDATE Customer SET balance = balance + ? WHERE idCustomer = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -152,6 +194,13 @@ public class CustomerDAO {
         }
     }
 
+    /**
+     * Mengurangi saldo dari Customer
+     *
+     * @param idCustomer ID Customer yang akan dikurangi saldonya
+     * @param amount Jumlah saldo yang akan dikurangi
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean deductBalance(String idCustomer, double amount) {
         String sql = "UPDATE Customer SET balance = balance - ? WHERE idCustomer = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -164,6 +213,12 @@ public class CustomerDAO {
         }
     }
 
+    /**
+     * Mendapatkan saldo dari Customer berdasarkan idCustomer
+     *
+     * @param idCustomer ID Customer yang dicari saldonya
+     * @return double saldo Customer, atau 0 jika tidak ditemukan
+     */
     public double getBalance(String idCustomer) {
         String sql = "SELECT balance FROM Customer WHERE idCustomer = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

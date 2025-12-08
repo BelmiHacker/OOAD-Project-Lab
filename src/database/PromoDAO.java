@@ -49,6 +49,12 @@ public class PromoDAO {
         }
     }
 
+    /**
+     * Insert Promo baru ke database
+     *
+     * @param promo Promo object yang akan disimpan
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean insertPromo(Promo promo) {
         String sql = "INSERT INTO Promo (idPromo, code, discountPercentage, headline) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -63,6 +69,12 @@ public class PromoDAO {
         }
     }
 
+    /**
+     * Get Promo by ID
+     *
+     * @param idPromo ID dari Promo yang dicari
+     * @return Promo object jika ditemukan, null jika tidak ditemukan
+     */
     public Promo getPromoById(String idPromo) {
         String sql = "SELECT * FROM Promo WHERE idPromo = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -82,6 +94,12 @@ public class PromoDAO {
         return null;
     }
 
+    /**
+     * Get Promo by Code
+     *
+     * @param code Code dari Promo yang dicari
+     * @return Promo object jika ditemukan, null jika tidak ditemukan
+     */
     public Promo getPromoByCode(String code) {
         String sql = "SELECT * FROM Promo WHERE code = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -101,6 +119,11 @@ public class PromoDAO {
         return null;
     }
 
+    /**
+     * Get semua Promo dari database
+     *
+     * @return List<Promo> daftar semua Promo
+     */
     public List<Promo> getAllPromos() {
         List<Promo> promos = new ArrayList<>();
         String sql = "SELECT * FROM Promo";
@@ -120,6 +143,12 @@ public class PromoDAO {
         return promos;
     }
 
+    /**
+     * Update data Promo di database
+     *
+     * @param promo Promo object yang akan diupdate
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean updatePromo(Promo promo) {
         String sql = "UPDATE Promo SET code = ?, discountPercentage = ?, headline = ? WHERE idPromo = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -134,6 +163,12 @@ public class PromoDAO {
         }
     }
 
+    /**
+     * Delete Promo dari database
+     *
+     * @param idPromo ID dari Promo yang akan dihapus
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean deletePromo(String idPromo) {
         String sql = "DELETE FROM Promo WHERE idPromo = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -145,6 +180,12 @@ public class PromoDAO {
         }
     }
 
+    /**
+     * Cek apakah promo dengan kode tertentu ada di database
+     *
+     * @param code Kode promo yang akan dicek
+     * @return boolean true jika ada, false jika tidak ada
+     */
     public boolean promoExists(String code) {
         String sql = "SELECT * FROM Promo WHERE code = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -157,6 +198,12 @@ public class PromoDAO {
         }
     }
 
+    /**
+     * Mendapatkan persentase diskon dari kode promo
+     *
+     * @param code Kode promo
+     * @return double persentase diskon, atau 0 jika kode tidak ditemukan
+     */
     public double getDiscountPercentage(String code) {
         String sql = "SELECT discountPercentage FROM Promo WHERE code = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
