@@ -1,6 +1,6 @@
 package view;
 
-import controller.ProductController;
+import controller.ProductHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -26,15 +26,17 @@ import java.util.List;
  * AdminProductListView - JavaFX view untuk daftar produk admin dengan edit/delete
  */
 public class AdminProductListView {
-	
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
 	private TextField searchField;
 	private TableView<Product> productTable;
-	
-	private ProductController pc = new ProductController();
+
+	// Handlers
+	private ProductHandler pc = new ProductHandler();
 	private NavigationListener navigationListener;
-	
+
+	// Constructor
 	public AdminProductListView(String adminId) {
 		init();
 		setupLayout();
@@ -42,7 +44,10 @@ public class AdminProductListView {
 		
 		scene = new Scene(mainLayout, 1100, 700);
 	}
-	
+
+	/**
+	 * Setup layout dan styling JavaFX
+	 */
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		
@@ -70,15 +75,7 @@ public class AdminProductListView {
 		searchBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15;");
 		searchBtn.setOnAction(e -> searchProducts());
 		
-		Button addBtn = new Button("Tambah Produk");
-		addBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #4CAF50; -fx-text-fill: white;");
-		addBtn.setOnAction(e -> {
-			if (navigationListener != null) {
-				navigationListener.navigateTo("ADMIN_DETAIL", "NEW");
-			}
-		});
-		
-		searchBox.getChildren().addAll(searchLabel, searchField, searchBtn, addBtn);
+		searchBox.getChildren().addAll(searchLabel, searchField, searchBtn);
 		mainLayout.setTop(new VBox(header, searchBox));
 		
 		// Table
@@ -103,19 +100,6 @@ public class AdminProductListView {
 			}
 		});
 		
-		Button deleteBtn = new Button("Hapus");
-		deleteBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #FF5252; -fx-text-fill: white;");
-		deleteBtn.setOnAction(e -> {
-			Product selected = productTable.getSelectionModel().getSelectedItem();
-			if (selected != null) {
-				// TODO: ProductController needs deleteProduct method added
-				showAlert("Info", "Delete functionality not yet implemented in ProductController");
-			} else {
-				showAlert("Warning", "Pilih produk terlebih dahulu!");
-			}
-		});
-		
-		
 		Button ordersBtn = new Button("Kelola Order");
 		ordersBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #FF9800; -fx-text-fill: white;");
 		ordersBtn.setOnAction(e -> {
@@ -132,10 +116,13 @@ public class AdminProductListView {
 			}
 		});
 		
-		buttonPanel.getChildren().addAll(editBtn, deleteBtn, ordersBtn, logoutBtn);
+		buttonPanel.getChildren().addAll(editBtn, ordersBtn, logoutBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
-	
+
+	/**
+	 * Setup kolom tabel produk
+	 */
 	private void setupTable() {
 		TableColumn<Product, String> idCol = new TableColumn<>("ID");
 		idCol.setCellValueFactory(new PropertyValueFactory<>("idProduct"));
@@ -172,7 +159,10 @@ public class AdminProductListView {
 		TableColumn<Product, ?>[] columns = new TableColumn[] {idCol, nameCol, categoryCol, priceCol, stockCol};
 		productTable.getColumns().addAll(columns);
 	}
-	
+
+	/**
+	 * Load data produk ke tabel dengan memanggil ProductHandler
+	 */
 	private void loadProducts() {
 		List<Product> products = pc.getAllProducts();
 		if (products != null) {
@@ -180,7 +170,10 @@ public class AdminProductListView {
 			productTable.setItems(items);
 		}
 	}
-	
+
+	/**
+	 * Cari produk berdasarkan keyword
+	 */
 	private void searchProducts() {
 		String keyword = searchField.getText().toLowerCase();
 		List<Product> allProducts = pc.getAllProducts();
@@ -196,14 +189,18 @@ public class AdminProductListView {
 		}
 		productTable.setItems(filteredList);
 	}
-	
+
+	/**
+	 * Tampilkan alert dialog
+	 */
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-	
+
+	// Getter dan Setter
 	public Scene getScene() {
 		return scene;
 	}
@@ -211,7 +208,8 @@ public class AdminProductListView {
 	public void setNavigationListener(NavigationListener listener) {
 		this.navigationListener = listener;
 	}
-	
+
+	// Inisialisasi komponen UI
 	private void init() {
 		mainLayout = new BorderPane();
 		searchField = new TextField();

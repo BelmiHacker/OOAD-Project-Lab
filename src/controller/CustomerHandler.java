@@ -10,14 +10,14 @@ import database.CustomerDAO;
  * Bertanggung jawab untuk validasi transaksi keuangan customer dan delegasi ke CustomerDAO.
  * 
  */
-public class CustomerController {
+public class CustomerHandler {
     private CustomerDAO customerDAO;
 
     /**
      * Constructor untuk CustomerController
      * Menginisialisasi CustomerDAO untuk akses database
      */
-    public CustomerController() {
+    public CustomerHandler() {
         this.customerDAO = new CustomerDAO();
     }
 
@@ -85,7 +85,7 @@ public class CustomerController {
      * @param idCustomer ID customer
      * @return Customer object jika ditemukan, null sebaliknya
      */
-    public Customer getCustomerById(String idCustomer) {
+    public Customer getCustomer(String idCustomer) {
         return customerDAO.getCustomerById(idCustomer);
     }
 
@@ -101,11 +101,12 @@ public class CustomerController {
 
     /**
      * Insert customer baru ke database
-     * 
+     *
      * @param customer Customer object yang akan diinsert
      * @return "success" jika insert berhasil, pesan error sebaliknya
      */
-    public String insertCustomer(Customer customer) {
+    //+registerAccount(fullName, email, password, phone, address)
+    public String registerAccount(Customer customer) {
         if (customerDAO.insertCustomer(customer)) {
             return "success";
         }
@@ -132,6 +133,6 @@ public class CustomerController {
      */
     public String createCustomer(String idCustomer, String idUser, double initialBalance) {
         Customer customer = new Customer(idCustomer, idUser, initialBalance);
-        return insertCustomer(customer);
+        return registerAccount(customer);
     }
 }

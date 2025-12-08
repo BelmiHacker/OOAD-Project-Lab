@@ -1,5 +1,7 @@
 package view;
 
+import controller.ProductHandler;
+import controller.UserHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -19,31 +21,41 @@ import javafx.scene.text.FontWeight;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Product;
+import model.User;
+
 import java.util.List;
 
 /**
  * CustomerProductListView - JavaFX view untuk daftar produk customer
  */
 public class CustomerProductListView {
-	
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
 	private TextField searchField;
 	private TableView<Product> productTable;
-	
-	private controller.ProductController pc = new controller.ProductController();
+
+	// Handlers
+	private ProductHandler pc = new ProductHandler();
+	private UserHandler uc = new UserHandler();
 	private String customerId;
+	private String userId;
 	private NavigationListener navigationListener;
-	
+
+	// Constructor
 	public CustomerProductListView(String customerId) {
 		this.customerId = customerId;
 		init();
 		setupLayout();
 		loadProducts();
+		loadUser();
 		
 		scene = new Scene(mainLayout, 1000, 700);
 	}
-	
+
+	/**
+	 * Setup layout dan styling JavaFX
+	 */
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		
@@ -111,6 +123,14 @@ public class CustomerProductListView {
 				navigationListener.navigateTo("TOPUP", customerId);
 			}
 		});
+
+		Button editProfileBtn = new Button("Edit Profile");
+		editProfileBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #4CAF50; -fx-text-fill: white;");
+		editProfileBtn.setOnAction(e -> {
+			if (navigationListener != null) {
+				navigationListener.navigateTo("EDIT_PROFILE", userId);
+			}
+		});
 		
 		Button logoutBtn = new Button("Logout");
 		logoutBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #999999; -fx-text-fill: white;");
@@ -120,14 +140,20 @@ public class CustomerProductListView {
 			}
 		});
 		
-		buttonPanel.getChildren().addAll(detailBtn, cartBtn, topUpBtn, logoutBtn);
+		buttonPanel.getChildren().addAll(detailBtn, cartBtn, topUpBtn, editProfileBtn, logoutBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
-	
+
+	/**
+	 * Set navigation listener untuk navigasi antar view
+	 */
 	public void setNavigationListener(NavigationListener listener) {
 		this.navigationListener = listener;
 	}
-	
+
+	/**
+	 * Setup kolom tabel produk
+	 */
 	private void setupTable() {
 		TableColumn<Product, String> idCol = new TableColumn<>("ID");
 		idCol.setCellValueFactory(new PropertyValueFactory<>("idProduct"));
@@ -164,7 +190,10 @@ public class CustomerProductListView {
 		TableColumn<Product, ?>[] columns = new TableColumn[] {idCol, nameCol, categoryCol, priceCol, stockCol};
 		productTable.getColumns().addAll(columns);
 	}
-	
+
+	/**
+	 * Load semua produk ke tabel
+	 */
 	private void loadProducts() {
 		List<Product> products = pc.getAllProducts();
 		if (products != null) {
@@ -172,7 +201,20 @@ public class CustomerProductListView {
 			productTable.setItems(items);
 		}
 	}
-	
+
+	/**
+	 * Load data user customer
+	 */
+	private void loadUser() {
+		User user = uc.getUserByCustomerId(customerId);
+		if (user != null) {
+			this.userId = user.getIdUser();
+		}
+	}
+
+	/**
+	 * Cari produk berdasarkan keyword
+	 */
 	private void searchProducts() {
 		String keyword = searchField.getText().toLowerCase();
 		List<Product> allProducts = pc.getAllProducts();
@@ -188,7 +230,8 @@ public class CustomerProductListView {
 		}
 		productTable.setItems(filteredList);
 	}
-	
+
+	// Getter Setter
 	public Scene getScene() {
 		return scene;
 	}
@@ -199,7 +242,8 @@ public class CustomerProductListView {
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-	
+
+	// Inisialisasi komponen UI
 	private void init() {
 		mainLayout = new BorderPane();
 		searchField = new TextField();

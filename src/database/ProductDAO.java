@@ -49,6 +49,12 @@ public class ProductDAO {
         }
     }
 
+    /**
+     * Insert Product baru ke database
+     *
+     * @param product Product object yang akan disimpan
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean insertProduct(Product product) {
         String sql = "INSERT INTO Product (idProduct, name, price, stock, category) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -64,6 +70,12 @@ public class ProductDAO {
         }
     }
 
+    /**
+     * Get Product by ID
+     *
+     * @param idProduct ID dari Product yang dicari
+     * @return Product object jika ditemukan, null jika tidak ditemukan
+     */
     public Product getProductById(String idProduct) {
         String sql = "SELECT * FROM Product WHERE idProduct = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -84,6 +96,11 @@ public class ProductDAO {
         return null;
     }
 
+    /**
+     * Get all Products from database
+     *
+     * @return List of Product objects
+     */
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM Product";
@@ -104,6 +121,37 @@ public class ProductDAO {
         return products;
     }
 
+    /**
+     * Get all available Products (stock > 0)
+     *
+     * @return List of available Product objects
+     */
+    public List<Product> getAvailableProducts() {
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT * FROM Product WHERE stock > 0";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                products.add(new Product(
+                        rs.getString("idProduct"),
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getInt("stock"),
+                        rs.getString("category")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
+    /**
+     * Get Products by category
+     *
+     * @param category Kategori yang dicari
+     * @return List of Product objects dalam kategori tersebut
+     */
     public List<Product> getProductsByCategory(String category) {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM Product WHERE category = ?";
@@ -125,6 +173,12 @@ public class ProductDAO {
         return products;
     }
 
+    /**
+     * Update data Product di database
+     *
+     * @param product Product object dengan data yang sudah diperbarui
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean updateProduct(Product product) {
         String sql = "UPDATE Product SET name = ?, price = ?, stock = ?, category = ? WHERE idProduct = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -140,6 +194,13 @@ public class ProductDAO {
         }
     }
 
+    /**
+     * Update stock produk
+     *
+     * @param idProduct ID dari Product yang akan diupdate
+     * @param newStock Stok baru
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean updateStock(String idProduct, int newStock) {
         String sql = "UPDATE Product SET stock = ? WHERE idProduct = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -152,6 +213,12 @@ public class ProductDAO {
         }
     }
 
+    /**
+     * Delete Product dari database
+     *
+     * @param idProduct ID Product yang akan dihapus
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean deleteProduct(String idProduct) {
         String sql = "DELETE FROM Product WHERE idProduct = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -163,6 +230,12 @@ public class ProductDAO {
         }
     }
 
+    /**
+     * Mendapatkan stok produk berdasarkan ID produk
+     *
+     * @param idProduct ID dari Product yang dicari
+     * @return int jumlah stok produk, atau 0 jika tidak ditemukan
+     */
     public int getStock(String idProduct) {
         String sql = "SELECT stock FROM Product WHERE idProduct = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -177,6 +250,12 @@ public class ProductDAO {
         return 0;
     }
 
+    /**
+     * Mendapatkan harga produk berdasarkan ID produk
+     *
+     * @param idProduct ID dari Product yang dicari
+     * @return double harga produk, atau 0 jika tidak ditemukan
+     */
     public double getPrice(String idProduct) {
         String sql = "SELECT price FROM Product WHERE idProduct = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

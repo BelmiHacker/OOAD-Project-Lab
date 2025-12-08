@@ -25,16 +25,19 @@ import java.util.List;
  * CourierListView - JavaFX view untuk daftar pengiriman courier
  */
 public class CourierListView {
-	
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
 	private TableView<Delivery> deliveryTable;
-	
+
+	// Handler
 	private DeliveryController dc = new DeliveryController();
-	
+
+	// State
 	private String courierId;
 	private NavigationListener navigationListener;
-	
+
+	// Constructor
 	public CourierListView(String courierId) {
 		this.courierId = courierId;
 		init();
@@ -43,7 +46,10 @@ public class CourierListView {
 		
 		scene = new Scene(mainLayout, 1000, 700);
 	}
-	
+
+	/**
+	 * Setup Layout
+	 */
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		
@@ -114,7 +120,10 @@ public class CourierListView {
 		buttonPanel.getChildren().addAll(detailBtn, updateBtn, logoutBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
-	
+
+	/**
+	 * Setup Table
+	 */
 	private void setupTable() {
 		TableColumn<Delivery, String> idCol = new TableColumn<>("ID Pengiriman");
 		idCol.setCellValueFactory(new PropertyValueFactory<>("idDelivery"));
@@ -144,7 +153,10 @@ public class CourierListView {
 		TableColumn<Delivery, ?>[] columns = new TableColumn[] {idCol, orderCol, courierCol, statusCol, addressCol, dateCol};
 		deliveryTable.getColumns().addAll(columns);
 	}
-	
+
+	/**
+	 * Load Deliveries
+	 */
 	private void loadDeliveries() {
 		// Get all deliveries for this courier
 		List<Delivery> deliveries = dc.getDeliveriesByCourierId(courierId);
@@ -153,14 +165,18 @@ public class CourierListView {
 			deliveryTable.setItems(items);
 		}
 	}
-	
+
+	/**
+	 * Show Alert
+	 */
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-	
+
+	// Getter and Setter
 	public Scene getScene() {
 		return scene;
 	}
@@ -168,7 +184,8 @@ public class CourierListView {
 	public void setNavigationListener(NavigationListener listener) {
 		this.navigationListener = listener;
 	}
-	
+
+	// Inisialisasi komponen UI
 	private void init() {
 		mainLayout = new BorderPane();
 		deliveryTable = new TableView<>();

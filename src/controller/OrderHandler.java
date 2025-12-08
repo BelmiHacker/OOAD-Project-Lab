@@ -17,7 +17,7 @@ import java.util.List;
  * Bertanggung jawab untuk manajemen pesanan, checkout, dan validasi transaksi.
  * 
  */
-public class OrderController {
+public class OrderHandler {
     private OrderHeaderDAO orderHeaderDAO;
     private OrderDetailDAO orderDetailDAO;
     private CartItemDAO cartItemDAO;
@@ -28,7 +28,7 @@ public class OrderController {
      * Constructor untuk OrderController
      * Menginisialisasi semua DAO yang diperlukan untuk operasi order
      */
-    public OrderController() {
+    public OrderHandler() {
         this.orderHeaderDAO = new OrderHeaderDAO();
         this.orderDetailDAO = new OrderDetailDAO();
         this.cartItemDAO = new CartItemDAO();
@@ -58,10 +58,6 @@ public class OrderController {
 
         if (totalAmount <= 0) {
             return "Total harus lebih dari 0";
-        }
-
-        if (idPromo != null && !idPromo.isEmpty() && !promoDAO.promoExists(idPromo)) {
-            return "Kode promo tidak ditemukan";
         }
 
         double customerBalance = customerDAO.getBalance(idCustomer);
@@ -104,13 +100,14 @@ public class OrderController {
     }
 
     /**
-     * Mendapatkan order berdasarkan ID
-     * 
+     * Mendapatkan order header milik customer berdasarkan ID order
+     *
      * @param idOrder ID order
+     * @param idCustomer ID customer
      * @return OrderHeader object jika ditemukan, null sebaliknya
      */
-    public OrderHeader getOrderById(String idOrder) {
-        return orderHeaderDAO.getOrderHeaderById(idOrder);
+    public OrderHeader getCustomerOrderHeader(String idOrder, String idCustomer) {
+        return orderHeaderDAO.getOrderHeaderById(idOrder, idCustomer);
     }
 
     /**
@@ -119,7 +116,7 @@ public class OrderController {
      * @param idCustomer ID customer
      * @return List order yang dipesan oleh customer
      */
-    public List<OrderHeader> getOrdersByCustomerId(String idCustomer) {
+    public List<OrderHeader> getCustomerOrders(String idCustomer) {
         return orderHeaderDAO.getOrderHeadersByCustomerId(idCustomer);
     }
 
@@ -149,7 +146,7 @@ public class OrderController {
      * @param status Status baru order
      * @return "success" jika update berhasil, pesan error sebaliknya
      */
-    public String updateOrderStatus(String idOrder, String status) {
+    public String editOrderHeaderStatus(String idOrder, String status) {
         if (orderHeaderDAO.updateOrderStatus(idOrder, status)) {
             return "success";
         }

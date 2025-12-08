@@ -48,6 +48,12 @@ public class AdminDAO {
         }
     }
 
+    /**
+     * Insert Admin baru ke database
+     *
+     * @param admin Admin object yang akan disimpan
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean insertAdmin(Admin admin) {
         String sql = "INSERT INTO Admin (idAdmin, idUser, emergencyContact) VALUES (?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -61,6 +67,12 @@ public class AdminDAO {
         }
     }
 
+    /**
+     * Mendapatkan Admin berdasarkan idAdmin
+     *
+     * @param idAdmin ID Admin yang dicari
+     * @return Admin object jika ditemukan, null jika tidak ditemukan
+     */
     public Admin getAdminById(String idAdmin) {
         String sql = "SELECT * FROM Admin WHERE idAdmin = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -79,6 +91,12 @@ public class AdminDAO {
         return null;
     }
 
+    /**
+     * Mendapatkan Admin berdasarkan idUser
+     *
+     * @param idUser ID User yang terkait dengan Admin
+     * @return Admin object jika ditemukan, null jika tidak ditemukan
+     */
     public Admin getAdminByUserId(String idUser) {
         String sql = "SELECT * FROM Admin WHERE idUser = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -97,6 +115,11 @@ public class AdminDAO {
         return null;
     }
 
+    /**
+     * Mendapatkan semua Admin dari database
+     *
+     * @return List<Admin> daftar semua Admin
+     */
     public List<Admin> getAllAdmins() {
         List<Admin> admins = new ArrayList<>();
         String sql = "SELECT * FROM Admin";
@@ -115,6 +138,12 @@ public class AdminDAO {
         return admins;
     }
 
+    /**
+     * Update data Admin di database
+     *
+     * @param admin Admin object dengan data yang sudah diperbarui
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean updateAdmin(Admin admin) {
         String sql = "UPDATE Admin SET idUser = ?, emergencyContact = ? WHERE idAdmin = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -128,6 +157,12 @@ public class AdminDAO {
         }
     }
 
+    /**
+     * Delete Admin dari database
+     *
+     * @param idAdmin ID Admin yang akan dihapus
+     * @return boolean true jika berhasil, false jika gagal
+     */
     public boolean deleteAdmin(String idAdmin) {
         String sql = "DELETE FROM Admin WHERE idAdmin = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

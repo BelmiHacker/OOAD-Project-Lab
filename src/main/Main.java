@@ -2,31 +2,24 @@ package main;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import view.NavigationListener;
-import view.AdminProductListView;
-import view.AdminProductDetailView;
-import view.AdminOrderListView;
-import view.LoginView;
-import view.RegisterView;
-import view.CustomerProductListView;
-import view.CustomerProductDetailView;
-import view.CartView;
-import view.CourierListView;
-import view.CourierDetailView;
-import view.TopUpView;
+import view.*;
 
 /**
  * Main - Entry point aplikasi JoymarKet dengan Navigation Controller
  */
 public class Main extends Application implements NavigationListener {
-    
+    // State aplikasi saat ini
     private Stage primaryStage;
     private String currentView = "ADMIN_LIST";
     private String currentAdminId = "ADM_00001";
+    private String currentUserId = "USR_00001";  // Bisa customer atau courier berdasarkan login
     private String currentCustomerId = "CUST_00001";  // Will be set by login
     private String currentCourierId = null;  // Will be set by login
     private String currentProductId = null;
-    
+
+    /**
+     * Memulai aplikasi dan menampilkan jendela utama
+     */
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -40,7 +33,10 @@ public class Main extends Application implements NavigationListener {
         navigateTo("LOGIN");
         primaryStage.show();
     }
-    
+
+    /**
+     * Menavigasi ke tampilan yang ditentukan
+     */
     @Override
     public void navigateTo(String viewName, String... params) {
         try {
@@ -111,7 +107,7 @@ public class Main extends Application implements NavigationListener {
                         CartView cartView = new CartView(currentCustomerId);
                         cartView.setNavigationListener(this);
                         primaryStage.setScene(cartView.getScene());
-                        primaryStage.setWidth(1000);
+                        primaryStage.setWidth(900);
                         primaryStage.setHeight(700);
                     }
                     break;
@@ -157,12 +153,26 @@ public class Main extends Application implements NavigationListener {
                     primaryStage.setWidth(1100);
                     primaryStage.setHeight(700);
                     break;
+
+                case "EDIT_PROFILE":
+                    if (params.length > 0) {
+                        currentUserId = params[0];
+                        ProfileView profileView = new ProfileView(currentUserId);
+                        profileView.setNavigationListener(this);
+                        primaryStage.setScene(profileView.getScene());
+                        primaryStage.setWidth(900);
+                        primaryStage.setHeight(700);
+                    }
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
+    /**
+     * Menavigasi kembali ke tampilan sebelumnya berdasarkan konteks saat ini
+     */
     @Override
     public void goBack() {
         // Navigate based on current view
@@ -184,9 +194,14 @@ public class Main extends Application implements NavigationListener {
             navigateTo("LOGIN");
         } else if ("COURIER_LIST".equals(currentView)) {
             navigateTo("LOGIN");
+        } else if ("EDIT_PROFILE".equals(currentView)) {
+            navigateTo("CUSTOMER_LIST", currentCustomerId);
         }
     }
-    
+
+    /**
+     * Metode utama untuk menjalankan aplikasi
+     */
     public static void main(String[] args) {
         launch(args);
     }

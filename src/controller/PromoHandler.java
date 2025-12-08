@@ -10,14 +10,14 @@ import database.PromoDAO;
  * Bertanggung jawab untuk validasi promo dan kalkulasi diskon.
  * 
  */
-public class PromoController {
+public class PromoHandler {
     private PromoDAO promoDAO;
 
     /**
      * Constructor untuk PromoController
      * Menginisialisasi PromoDAO untuk akses database
      */
-    public PromoController() {
+    public PromoHandler() {
         this.promoDAO = new PromoDAO();
     }
 
@@ -27,7 +27,7 @@ public class PromoController {
      * @param code Kode promo
      * @return Promo object jika ditemukan, null sebaliknya
      */
-    public Promo getPromoByCode(String code) {
+    public Promo getPromo(String code) {
         return promoDAO.getPromoByCode(code);
     }
 

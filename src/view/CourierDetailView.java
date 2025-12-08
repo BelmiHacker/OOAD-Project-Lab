@@ -21,17 +21,20 @@ import model.Delivery;
  * CourierDetailView - JavaFX view untuk detail pengiriman courier
  */
 public class CourierDetailView {
-	
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
-	
+
+	// Handler
 	private DeliveryController dc = new DeliveryController();
-	
+
+	// State
 	private String deliveryId;
 	private NavigationListener navigationListener;
 	
 	private Delivery delivery;
-	
+
+	// Constructor
 	public CourierDetailView(String deliveryId, String courierId) {
 		this.deliveryId = deliveryId;
 		this.delivery = dc.getDeliveryById(deliveryId);
@@ -42,7 +45,10 @@ public class CourierDetailView {
 		
 		scene = new Scene(mainLayout, 900, 700);
 	}
-	
+
+	/**
+	 * Setup Layout
+	 */
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		
@@ -164,18 +170,25 @@ public class CourierDetailView {
 		addressTA.setText(delivery != null ? (delivery.getAddressDelivery() != null ? delivery.getAddressDelivery() : "") : "");
 		dateTF.setText(delivery != null ? (delivery.getDateDelivery() != null ? delivery.getDateDelivery() : "") : "");
 	}
-	
+
+	/**
+	 * Load Data
+	 */
 	private void loadData() {
 		// Data already loaded in setupLayout
 	}
-	
+
+	/**
+	 * Show Alert
+	 */
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-	
+
+	// Getter and Setter
 	public Scene getScene() {
 		return scene;
 	}
@@ -183,7 +196,8 @@ public class CourierDetailView {
 	public void setNavigationListener(NavigationListener listener) {
 		this.navigationListener = listener;
 	}
-	
+
+	// Inisialisasi komponen UI
 	private void init() {
 		mainLayout = new BorderPane();
 	}

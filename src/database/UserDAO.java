@@ -98,6 +98,12 @@ public class UserDAO {
         }
     }
 
+    /**
+     * Get user by ID
+     *
+     * @param idUser ID user yang dicari
+     * @return User object jika ditemukan, null jika tidak ditemukan
+     */
     public User getUserById(String idUser) {
         String sql = "SELECT * FROM User WHERE idUser = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -120,6 +126,40 @@ public class UserDAO {
         return null;
     }
 
+    /**
+     * Get user by Customer ID
+     *
+     * @param idCustomer ID customer yang dicari
+     * @return User object jika ditemukan, null jika tidak ditemukan
+     */
+    public User getUserByCustomerId(String idCustomer) {
+        String sql = "SELECT u.* FROM User u JOIN Customer c ON u.idUser = c.idUser WHERE c.idCustomer = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, idCustomer);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new User(
+                        rs.getString("idUser"),
+                        rs.getString("fullName"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("phone"),
+                        rs.getString("address"),
+                        rs.getString("role")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Get user by Email
+     *
+     * @param email Email user yang dicari
+     * @return User object jika ditemukan, null jika tidak ditemukan
+     */
     public User getUserByEmail(String email) {
         String sql = "SELECT * FROM User WHERE email = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -142,6 +182,11 @@ public class UserDAO {
         return null;
     }
 
+    /**
+     * Get semua user dari database
+     *
+     * @return List<User> daftar semua user
+     */
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM User";
@@ -164,6 +209,12 @@ public class UserDAO {
         return users;
     }
 
+    /**
+     * Update data user di database
+     *
+     * @param user User object dengan data yang sudah diperbarui
+     * @return true jika berhasil, false sebaliknya
+     */
     public boolean updateUser(User user) {
         String sql = "UPDATE User SET fullName = ?, email = ?, password = ?, phone = ?, address = ?, role = ? WHERE idUser = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -181,6 +232,12 @@ public class UserDAO {
         }
     }
 
+    /**
+     * Delete user dari database
+     *
+     * @param idUser ID user yang akan dihapus
+     * @return true jika berhasil, false sebaliknya
+     */
     public boolean deleteUser(String idUser) {
         String sql = "DELETE FROM User WHERE idUser = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -192,6 +249,12 @@ public class UserDAO {
         }
     }
 
+    /**
+     * Cek apakah email sudah terdaftar di database
+     *
+     * @param email Email yang akan dicek
+     * @return true jika email sudah ada, false jika belum
+     */
     public boolean emailExists(String email) {
         String sql = "SELECT * FROM User WHERE email = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -204,6 +267,12 @@ public class UserDAO {
         }
     }
 
+    /**
+     * Cek apakah ID user ada di database
+     *
+     * @param idUser ID user yang akan dicek
+     * @return true jika ID user ada, false jika tidak ada
+     */
     public boolean idExists(String idUser) {
         String sql = "SELECT * FROM User WHERE idUser = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

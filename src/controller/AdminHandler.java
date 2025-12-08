@@ -10,14 +10,14 @@ import database.AdminDAO;
  * Bertanggung jawab untuk CRUD operation admin dan delegasi ke AdminDAO.
  * 
  */
-public class AdminController {
+public class AdminHandler {
     private AdminDAO adminDAO;
 
     /**
      * Constructor untuk AdminController
      * Menginisialisasi AdminDAO untuk akses database
      */
-    public AdminController() {
+    public AdminHandler() {
         this.adminDAO = new AdminDAO();
     }
 
@@ -27,7 +27,7 @@ public class AdminController {
      * @param idAdmin ID admin yang dicari
      * @return Admin object jika ditemukan, null sebaliknya
      */
-    public Admin getAdminById(String idAdmin) {
+    public Admin getAdmin(String idAdmin) {
         return adminDAO.getAdminById(idAdmin);
     }
 
