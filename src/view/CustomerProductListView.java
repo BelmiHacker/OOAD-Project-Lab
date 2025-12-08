@@ -26,16 +26,18 @@ import java.util.List;
  * CustomerProductListView - JavaFX view untuk daftar produk customer
  */
 public class CustomerProductListView {
-	
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
 	private TextField searchField;
 	private TableView<Product> productTable;
-	
+
+	// Handlers
 	private ProductHandler pc = new ProductHandler();
 	private String customerId;
 	private NavigationListener navigationListener;
-	
+
+	// Constructor
 	public CustomerProductListView(String customerId) {
 		this.customerId = customerId;
 		init();
@@ -44,7 +46,10 @@ public class CustomerProductListView {
 		
 		scene = new Scene(mainLayout, 1000, 700);
 	}
-	
+
+	/**
+	 * Setup layout dan styling JavaFX
+	 */
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		
@@ -124,11 +129,17 @@ public class CustomerProductListView {
 		buttonPanel.getChildren().addAll(detailBtn, cartBtn, topUpBtn, logoutBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
-	
+
+	/**
+	 * Set navigation listener untuk navigasi antar view
+	 */
 	public void setNavigationListener(NavigationListener listener) {
 		this.navigationListener = listener;
 	}
-	
+
+	/**
+	 * Setup kolom tabel produk
+	 */
 	private void setupTable() {
 		TableColumn<Product, String> idCol = new TableColumn<>("ID");
 		idCol.setCellValueFactory(new PropertyValueFactory<>("idProduct"));
@@ -165,7 +176,10 @@ public class CustomerProductListView {
 		TableColumn<Product, ?>[] columns = new TableColumn[] {idCol, nameCol, categoryCol, priceCol, stockCol};
 		productTable.getColumns().addAll(columns);
 	}
-	
+
+	/**
+	 * Load semua produk ke tabel
+	 */
 	private void loadProducts() {
 		List<Product> products = pc.getAllProducts();
 		if (products != null) {
@@ -173,7 +187,10 @@ public class CustomerProductListView {
 			productTable.setItems(items);
 		}
 	}
-	
+
+	/**
+	 * Cari produk berdasarkan keyword
+	 */
 	private void searchProducts() {
 		String keyword = searchField.getText().toLowerCase();
 		List<Product> allProducts = pc.getAllProducts();
@@ -189,7 +206,8 @@ public class CustomerProductListView {
 		}
 		productTable.setItems(filteredList);
 	}
-	
+
+	// Getter Setter
 	public Scene getScene() {
 		return scene;
 	}
@@ -200,7 +218,8 @@ public class CustomerProductListView {
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-	
+
+	// Inisialisasi komponen UI
 	private void init() {
 		mainLayout = new BorderPane();
 		searchField = new TextField();

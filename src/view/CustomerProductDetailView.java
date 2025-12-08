@@ -24,19 +24,22 @@ import model.CartItem;
  * CustomerProductDetailView - JavaFX view untuk detail produk dan tambah ke keranjang
  */
 public class CustomerProductDetailView {
-	
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
 	private GridPane detailGrid;
-	
+
+	// Handlers
 	private ProductHandler pc = new ProductHandler();
 	private CartItemHandler cic = new CartItemHandler();
 	private NavigationListener navigationListener;
-	
+
+	// State
 	private String productId;
 	private String customerId;
 	private Product product;
-	
+
+	// UI Elements
 	private Label idLabel;
 	private Label nameLabel;
 	private Label categoryLabel;
@@ -54,7 +57,8 @@ public class CustomerProductDetailView {
 	
 	private Button addToCartBtn;
 	private Button backBtn;
-	
+
+	// Constructor
 	public CustomerProductDetailView(String productId, String customerId) {
 		this.productId = productId;
 		this.customerId = customerId;
@@ -65,14 +69,20 @@ public class CustomerProductDetailView {
 		
 		scene = new Scene(mainLayout, 900, 700);
 	}
-	
+
+	/**
+	 * Load detail produk dari handler
+	 */
 	private void loadProductDetail() {
 		product = pc.getProduct(productId);
 		if (product == null) {
 			showAlert("Error", "Produk tidak ditemukan!");
 		}
 	}
-	
+
+	/**
+	 * Setup layout dan styling JavaFX
+	 */
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		
@@ -150,7 +160,10 @@ public class CustomerProductDetailView {
 		buttonPanel.getChildren().addAll(backBtn, addToCartBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
-	
+
+	/**
+	 * Setup action handlers untuk tombol
+	 */
 	private void setupActions() {
 		addToCartBtn.setOnAction(e -> {
 			int quantity = quantitySpinner.getValue();
@@ -185,14 +198,18 @@ public class CustomerProductDetailView {
 			}
 		});
 	}
-	
+
+	/**
+	 * Tampilkan alert dialog
+	 */
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-	
+
+	// Getter Setter
 	public Scene getScene() {
 		return scene;
 	}
@@ -200,7 +217,8 @@ public class CustomerProductDetailView {
 	public void setNavigationListener(NavigationListener listener) {
 		this.navigationListener = listener;
 	}
-	
+
+	// Inisialisasi komponen UI
 	private void init() {
 		addToCartBtn = new Button("Tambah ke Keranjang");
 		backBtn = new Button("Kembali");

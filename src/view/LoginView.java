@@ -24,11 +24,12 @@ import model.Customer;
  * LoginView - JavaFX view untuk halaman login
  */
 public class LoginView {
-	
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
 	private GridPane gridLayout;
-	
+
+	// UI Elements
 	private Label emailLabel;
 	private Label passLabel;
 	
@@ -36,12 +37,14 @@ public class LoginView {
 	private PasswordField passTF;
 	private Hyperlink link;
 	private Button button;
-	
+
+	// Handlers
 	private UserHandler uc = new UserHandler();
 	private CustomerHandler cc = new CustomerHandler();
 	private User loggedInUser;
 	private NavigationListener navigationListener;
-	
+
+	// Constructor
 	public LoginView() {
 		init();
 		setupLayout();
@@ -49,7 +52,8 @@ public class LoginView {
 		
 		scene = new Scene(mainLayout, 800, 600);
 	}
-	
+
+	// Setup layout dan styling JavaFX
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		
@@ -95,7 +99,8 @@ public class LoginView {
 		
 		mainLayout.setCenter(gridLayout);
 	}
-	
+
+	// Setup actions untuk button dan link
 	private void setupActions() {
 		button.setOnAction(e -> {
 			String result = uc.login(emailTF.getText(), passTF.getText());
@@ -130,26 +135,25 @@ public class LoginView {
 			}
 		});
 	}
-	
+
+	// Tampilkan alert dialog
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-	
+
+	// Getters dan Setters
 	public Scene getScene() {
 		return scene;
-	}
-	
-	public User getLoggedInUser() {
-		return loggedInUser;
 	}
 	
 	public void setNavigationListener(NavigationListener listener) {
 		this.navigationListener = listener;
 	}
-	
+
+	// Inisialisasi komponen UI
 	private void init() {
 		button = new Button("Login");
 		link = new Hyperlink("Belum punya akun? Daftar di sini");

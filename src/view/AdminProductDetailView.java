@@ -22,18 +22,21 @@ import model.Product;
  * edit/create
  */
 public class AdminProductDetailView {
-
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
 	private GridPane detailGrid;
 
+	// Handlers
 	private ProductHandler pc = new ProductHandler();
 	private NavigationListener navigationListener;
 
+	// State
 	private String productId;
 	private Product product;
 	private boolean isNew;
 
+	// UI Elements
 	private Label idLabel;
 	private Label nameLabel;
 	private Label categoryLabel;
@@ -65,6 +68,9 @@ public class AdminProductDetailView {
 		scene = new Scene(mainLayout, 900, 700);
 	}
 
+	/**
+	 * Load detail produk dari ProductHandler
+	 */
 	private void loadProductDetail() {
 		if (!isNew) {
 			product = pc.getProduct(productId);
@@ -75,6 +81,9 @@ public class AdminProductDetailView {
 		}
 	}
 
+	/**
+	 * Setup layout dan styling JavaFX
+	 */
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 
@@ -156,6 +165,9 @@ public class AdminProductDetailView {
 		mainLayout.setBottom(buttonPanel);
 	}
 
+	/**
+	 * Setup action handlers untuk tombol
+	 */
 	private void setupActions() {
 		saveBtn.setOnAction(e -> {
 			// Validate fields
@@ -197,6 +209,9 @@ public class AdminProductDetailView {
 		});
 	}
 
+	/**
+	 * Tampilkan alert dialog
+	 */
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
@@ -204,6 +219,7 @@ public class AdminProductDetailView {
 		alert.showAndWait();
 	}
 
+	// Getter dan Setter
 	public Scene getScene() {
 		return scene;
 	}
@@ -212,6 +228,9 @@ public class AdminProductDetailView {
 		this.navigationListener = listener;
 	}
 
+	/**
+	 * Inisialisasi komponen UI
+	 */
 	private void init() {
 		saveBtn = new Button("Simpan");
 		backBtn = new Button("Kembali");

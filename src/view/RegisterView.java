@@ -22,11 +22,12 @@ import javafx.geometry.Pos;
  * RegisterView - JavaFX view untuk halaman registrasi pengguna baru
  */
 public class RegisterView {
-	
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
 	private GridPane gridLayout;
-	
+
+	// UI Elements
 	private Label fullNameLabel;
 	private Label emailLabel;
 	private Label passLabel;
@@ -43,11 +44,13 @@ public class RegisterView {
 	
 	private Button registerBtn;
 	private Button backBtn;
-	
+
+	// Handlers
 	private UserHandler uc = new UserHandler();
 	private CustomerHandler cc = new CustomerHandler();
 	private NavigationListener navigationListener;
-	
+
+	// Constructor
 	public RegisterView() {
 		init();
 		setupLayout();
@@ -55,7 +58,8 @@ public class RegisterView {
 		
 		scene = new Scene(mainLayout, 800, 700);
 	}
-	
+
+	// Setup layout dan styling JavaFX
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		
@@ -127,7 +131,8 @@ public class RegisterView {
 		
 		mainLayout.setCenter(gridLayout);
 	}
-	
+
+	// Setup actions untuk button
 	private void setupActions() {
 		registerBtn.setOnAction(e -> {
 			String fullName = fullNameTF.getText();
@@ -171,14 +176,16 @@ public class RegisterView {
 			}
 		});
 	}
-	
+
+	// Tampilkan alert dialog
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-	
+
+	// Getters dan Setters
 	public Scene getScene() {
 		return scene;
 	}
@@ -186,7 +193,8 @@ public class RegisterView {
 	public void setNavigationListener(NavigationListener listener) {
 		this.navigationListener = listener;
 	}
-	
+
+	// Inisialisasi komponen UI
 	private void init() {
 		registerBtn = new Button("Daftar");
 		backBtn = new Button("Kembali");

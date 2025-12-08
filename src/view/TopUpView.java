@@ -20,20 +20,24 @@ import javafx.geometry.Pos;
  * TopUpView - JavaFX view untuk top up balance customer
  */
 public class TopUpView {
-	
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
 	private GridPane formLayout;
-	
+
+	// Handlers
 	private CustomerHandler cc = new CustomerHandler();
-	
+
+	// State
 	private String customerId;
 	private NavigationListener navigationListener;
-	
+
+	// UI Elements
 	private TextField amountField;
 	private Button topUpBtn;
 	private Button backBtn;
-	
+
+	// Constructor
 	public TopUpView(String customerId) {
 		this.customerId = customerId;
 		init();
@@ -41,7 +45,8 @@ public class TopUpView {
 		
 		scene = new Scene(mainLayout, 700, 500);
 	}
-	
+
+	// Setup layout dan styling JavaFX
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		
@@ -81,14 +86,14 @@ public class TopUpView {
 		amountLabel.setStyle("-fx-font-weight: bold;");
 		amountField.setPrefWidth(300);
 		amountField.setStyle("-fx-font-size: 12; -fx-padding: 10;");
-		amountField.setPromptText("Masukkan jumlah (minimal Rp 100.000)");
+		amountField.setPromptText("Masukkan jumlah (minimal Rp 10.000)");
 		formLayout.add(amountLabel, 0, 1);
 		formLayout.add(amountField, 1, 1);
 		
 		// Info
 		Label infoLabel = new Label("Informasi:");
 		infoLabel.setStyle("-fx-font-weight: bold;");
-		Label infoText = new Label("• Minimal top up: Rp 100.000\n• Maksimal top up: Rp 50.000.000\n• Top up langsung masuk ke saldo Anda");
+		Label infoText = new Label("• Minimal top up: Rp 10.000\n• Top up langsung masuk ke saldo Anda");
 		infoText.setStyle("-fx-font-size: 11; -fx-text-fill: #666666;");
 		formLayout.add(infoLabel, 0, 2);
 		formLayout.add(infoText, 1, 2);
@@ -114,7 +119,8 @@ public class TopUpView {
 		buttonPanel.getChildren().addAll(backBtn, topUpBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
-	
+
+	// Handle top up action
 	private void handleTopUp() {
 		String amountStr = amountField.getText().trim();
 		
@@ -126,13 +132,8 @@ public class TopUpView {
 		try {
 			double amount = Double.parseDouble(amountStr);
 			
-			if (amount < 100000) {
-				showAlert("Error", "Minimal top up adalah Rp 100.000");
-				return;
-			}
-			
-			if (amount > 50000000) {
-				showAlert("Error", "Maksimal top up adalah Rp 50.000.000");
+			if (amount < 10000) {
+				showAlert("Error", "Minimal top up adalah Rp 10.000");
 				return;
 			}
 			
@@ -152,6 +153,7 @@ public class TopUpView {
 		}
 	}
 	
+	// Show alert dialog
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
@@ -159,6 +161,7 @@ public class TopUpView {
 		alert.showAndWait();
 	}
 	
+	// Getter dan Setter
 	public Scene getScene() {
 		return scene;
 	}
@@ -167,6 +170,7 @@ public class TopUpView {
 		this.navigationListener = listener;
 	}
 	
+	// Inisialisasi komponen UI
 	private void init() {
 		mainLayout = new BorderPane();
 		formLayout = new GridPane();

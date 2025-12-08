@@ -32,25 +32,29 @@ import java.util.List;
  * CartView - JavaFX view untuk keranjang belanja customer
  */
 public class CartView {
-	
+	// UI Components
 	private Scene scene;
 	private BorderPane mainLayout;
 	private TableView<CartItem> cartTable;
-	
+
+	// Handlers
 	private CartItemHandler cic = new CartItemHandler();
 	private ProductHandler pc = new ProductHandler();
 	private CustomerHandler cc = new CustomerHandler();
 	private OrderHandler oc = new OrderHandler();
 	private PromoHandler promoC = new PromoHandler();
-	
+
+	// State
 	private String customerId;
 	private NavigationListener navigationListener;
-	
+
+	// UI Elements
 	private Label totalLabel;
 	private Label balanceLabel;
 	private Label discountLabel;
 	private ComboBox<Promo> promoCombo;
-	
+
+	// Constructor
 	public CartView(String customerId) {
 		this.customerId = customerId;
 		init();
@@ -59,7 +63,8 @@ public class CartView {
 		
 		scene = new Scene(mainLayout, 1000, 700);
 	}
-	
+
+	// Setup layout dan styling JavaFX
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		
@@ -173,7 +178,8 @@ public class CartView {
 		bottomBox.getChildren().addAll(footerPanel, buttonPanel);
 		mainLayout.setBottom(bottomBox);
 	}
-	
+
+	// Setup table columns
 	private void setupTable() {
 		TableColumn<CartItem, String> idCol = new TableColumn<>("ID Item");
 		idCol.setCellValueFactory(new PropertyValueFactory<>("idCartItem"));
@@ -209,7 +215,8 @@ public class CartView {
 		TableColumn<CartItem, ?>[] columns = new TableColumn[] {idCol, productCol, qtyCol, priceCol, subtotalCol};
 		cartTable.getColumns().addAll(columns);
 	}
-	
+
+	// Load cart items from handler
 	private void loadCartItems() {
 		// Get cart items for this customer
 		CartItem cartItems = cic.getCartItems(customerId);
@@ -221,7 +228,8 @@ public class CartView {
 
 		updateTotalAndBalance();
 	}
-	
+
+	// Update total amount and customer balance display
 	private void updateTotalAndBalance() {
 		double balance = cc.getBalance(customerId);
 		double total = 0;
@@ -256,7 +264,8 @@ public class CartView {
 			totalLabel.setTextFill(Color.GREEN);
 		}
 	}
-	
+
+	// Handle checkout process
 	private void checkout() {
 		List<CartItem> cartItems = cartTable.getItems();
 		
@@ -313,14 +322,16 @@ public class CartView {
 			showAlert("Error", "Checkout gagal: " + result);
 		}
 	}
-	
+
+	// Show alert dialog
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-	
+
+	// Getter dan Setter
 	public Scene getScene() {
 		return scene;
 	}
@@ -328,7 +339,8 @@ public class CartView {
 	public void setNavigationListener(NavigationListener listener) {
 		this.navigationListener = listener;
 	}
-	
+
+	// Inisialisasi komponen UI
 	private void init() {
 		mainLayout = new BorderPane();
 		cartTable = new TableView<>();
