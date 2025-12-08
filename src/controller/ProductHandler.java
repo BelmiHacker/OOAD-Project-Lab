@@ -67,7 +67,7 @@ public class ProductHandler {
      * @param category Kategori produk
      * @return List produk dengan kategori yang sesuai
      */
-    public java.util.List<Product> getProductsByCategory(String category) {
+    public List<Product> getProductsByCategory(String category) {
         return productDAO.getProductsByCategory(category);
     }
 
@@ -124,5 +124,18 @@ public class ProductHandler {
             return "success";
         }
         return "Update produk gagal";
+    }
+
+    /**
+     * Hapus produk berdasarkan ID
+     *
+     * @param idProduct ID produk yang akan dihapus
+     * @return "success" jika hapus berhasil, pesan error sebaliknya
+     */
+    public String deleteProduct(String idProduct) {
+        if (productDAO.deleteProduct(idProduct)) {
+            return "success";
+        }
+        return "Hapus produk gagal";
     }
 }

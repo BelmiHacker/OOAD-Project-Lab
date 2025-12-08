@@ -75,15 +75,7 @@ public class AdminProductListView {
 		searchBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15;");
 		searchBtn.setOnAction(e -> searchProducts());
 		
-		Button addBtn = new Button("Tambah Produk");
-		addBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #4CAF50; -fx-text-fill: white;");
-		addBtn.setOnAction(e -> {
-			if (navigationListener != null) {
-				navigationListener.navigateTo("ADMIN_DETAIL", "NEW");
-			}
-		});
-		
-		searchBox.getChildren().addAll(searchLabel, searchField, searchBtn, addBtn);
+		searchBox.getChildren().addAll(searchLabel, searchField, searchBtn);
 		mainLayout.setTop(new VBox(header, searchBox));
 		
 		// Table
@@ -108,17 +100,21 @@ public class AdminProductListView {
 			}
 		});
 		
-		Button deleteBtn = new Button("Hapus");
-		deleteBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #FF5252; -fx-text-fill: white;");
-		deleteBtn.setOnAction(e -> {
-			Product selected = productTable.getSelectionModel().getSelectedItem();
-			if (selected != null) {
-				// TODO: ProductController needs deleteProduct method added
-				showAlert("Info", "Delete functionality not yet implemented in ProductController");
-			} else {
-				showAlert("Warning", "Pilih produk terlebih dahulu!");
-			}
-		});
+//		Button deleteBtn = new Button("Hapus");
+//		deleteBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #FF5252; -fx-text-fill: white;");
+//		deleteBtn.setOnAction(e -> {
+//			Product selected = productTable.getSelectionModel().getSelectedItem();
+//			if (selected != null) {
+//				// delete product
+//				String result = pc.deleteProduct(selected.getIdProduct());
+//				if (result.equals("success")) {
+//					showAlert("Success", "Produk berhasil dihapus.");
+//					loadProducts();
+//				}
+//			} else {
+//				showAlert("Warning", "Pilih produk terlebih dahulu!");
+//			}
+//		});
 		
 		
 		Button ordersBtn = new Button("Kelola Order");
@@ -137,7 +133,7 @@ public class AdminProductListView {
 			}
 		});
 		
-		buttonPanel.getChildren().addAll(editBtn, deleteBtn, ordersBtn, logoutBtn);
+		buttonPanel.getChildren().addAll(editBtn, ordersBtn, logoutBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
 
