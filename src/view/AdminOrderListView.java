@@ -1,6 +1,6 @@
 package view;
 
-import controller.OrderController;
+import controller.OrderHandler;
 import controller.DeliveryController;
 import controller.CourierController;
 import javafx.scene.Scene;
@@ -34,7 +34,7 @@ public class AdminOrderListView {
 	private BorderPane mainLayout;
 	private TableView<OrderHeader> orderTable;
 	
-	private OrderController oc = new OrderController();
+	private OrderHandler oc = new OrderHandler();
 	private DeliveryController dc = new DeliveryController();
 	private CourierController cc = new CourierController();
 	

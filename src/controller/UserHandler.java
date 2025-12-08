@@ -1,6 +1,5 @@
 package controller;
 
-import model.Customer;
 import model.User;
 import database.UserDAO;
 
@@ -11,14 +10,14 @@ import database.UserDAO;
  * Bertanggung jawab untuk validasi input dan delegasi ke UserDAO.
  * 
  */
-public class UserController {
+public class UserHandler {
     private UserDAO userDAO;
 
     /**
      * Constructor untuk UserController
      * Menginisialisasi UserDAO untuk akses database
      */
-    public UserController() {
+    public UserHandler() {
         this.userDAO = new UserDAO();
     }
 
@@ -54,7 +53,7 @@ public class UserController {
      * - Password minimal 6 karakter dan harus sama dengan konfirmasi
      * - Nomor telepon harus 10-13 digit
      * - Alamat tidak boleh kosong
-     * 
+     *
      * @param idUser ID user yang akan didaftarkan
      * @param fullName Nama lengkap user
      * @param email Email user (harus @gmail.com)
@@ -64,7 +63,7 @@ public class UserController {
      * @param address Alamat user
      * @return "success" jika registrasi berhasil, pesan error sebaliknya
      */
-    public String register(String idUser, String fullName, String email, String password, 
+    public String register(String idUser, String fullName, String email, String password,
                            String confirmPassword, String phone, String address) {
         if (idUser == null || idUser.isEmpty()) {
             return "User ID tidak boleh kosong";
@@ -196,7 +195,7 @@ public class UserController {
      * @param idUser ID user yang dicari
      * @return User object jika ditemukan, null sebaliknya
      */
-    public User getUserById(String idUser) {
+    public User getUser(String idUser) {
         return userDAO.getUserById(idUser);
     }
 

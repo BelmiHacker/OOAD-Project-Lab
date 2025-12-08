@@ -11,7 +11,7 @@ import database.ProductDAO;
  * Bertanggung jawab untuk validasi dan manajemen item dalam keranjang belanja customer.
  * 
  */
-public class CartItemController {
+public class CartItemHandler {
     private CartItemDAO cartItemDAO;
     private ProductDAO productDAO;
 
@@ -19,7 +19,7 @@ public class CartItemController {
      * Constructor untuk CartItemController
      * Menginisialisasi CartItemDAO dan ProductDAO untuk akses database
      */
-    public CartItemController() {
+    public CartItemHandler() {
         this.cartItemDAO = new CartItemDAO();
         this.productDAO = new ProductDAO();
     }
@@ -27,14 +27,13 @@ public class CartItemController {
     /**
      * Tambahkan produk ke keranjang belanja
      * Validasi memastikan jumlah produk valid dan stok tersedia
-     * 
-     * @param idCartItem ID cart item unik
+     *
      * @param idCustomer ID customer yang menambahkan ke cart
      * @param idProduct ID produk yang ditambahkan
      * @param count Jumlah produk yang ditambahkan
      * @return "success" jika berhasil, pesan error sebaliknya
      */
-    public String addProductToCart(String idCartItem, String idCustomer, String idProduct, int count) {
+    public String createCartItem(String idCustomer, String idProduct, int count) {
         if (count <= 0) {
             return "Jumlah harus lebih dari 0";
         }
@@ -44,7 +43,7 @@ public class CartItemController {
             return "Jumlah melebihi stok yang tersedia";
         }
 
-        CartItem cartItem = new CartItem(idCartItem, idCustomer, idProduct, count);
+        CartItem cartItem = new CartItem("CART_" + System.currentTimeMillis(), idCustomer, idProduct, count);
         if (cartItemDAO.insertCartItem(cartItem)) {
             return "success";
         }
@@ -92,7 +91,7 @@ public class CartItemController {
      * @param idCustomer ID customer
      * @return CartItem object jika ditemukan, null sebaliknya
      */
-    public CartItem getCartItemByCustomerId(String idCustomer) {
+    public CartItem getCartItems(String idCustomer) {
         return cartItemDAO.getCartItemByCustomerId(idCustomer);
     }
 
@@ -106,13 +105,14 @@ public class CartItemController {
     }
 
     /**
-     * Hapus satu cart item
-     * 
-     * @param idCartItem ID cart item yang akan dihapus
+     * Hapus cart item berdasarkan ID customer dan ID produk
+     *
+     * @param idCustomer ID customer
+     * @param idProduct ID produk
      * @return "success" jika berhasil, pesan error sebaliknya
      */
-    public String deleteCartItem(String idCartItem) {
-        if (cartItemDAO.deleteCartItem(idCartItem)) {
+    public String deleteCartItem(String idCustomer, String idProduct) {
+        if (cartItemDAO.deleteCartItem(idCustomer, idProduct)) {
             return "success";
         }
         return "Hapus dari cart gagal";

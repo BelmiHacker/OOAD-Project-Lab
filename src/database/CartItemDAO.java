@@ -146,10 +146,11 @@ public class CartItemDAO {
         }
     }
 
-    public boolean deleteCartItem(String idCartItem) {
-        String sql = "DELETE FROM CartItem WHERE idCartItem = ?";
+    public boolean deleteCartItem(String idCustomer, String idProduct) {
+        String sql = "DELETE FROM CartItem WHERE idCustomer = ? AND idProduct = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, idCartItem);
+            ps.setString(1, idCustomer);
+            ps.setString(2, idProduct);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

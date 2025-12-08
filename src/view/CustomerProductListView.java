@@ -1,5 +1,6 @@
 package view;
 
+import controller.ProductHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -31,7 +32,7 @@ public class CustomerProductListView {
 	private TextField searchField;
 	private TableView<Product> productTable;
 	
-	private controller.ProductController pc = new controller.ProductController();
+	private ProductHandler pc = new ProductHandler();
 	private String customerId;
 	private NavigationListener navigationListener;
 	

@@ -67,10 +67,11 @@ public class OrderHeaderDAO {
         }
     }
 
-    public OrderHeader getOrderHeaderById(String idOrder) {
-        String sql = "SELECT * FROM OrderHeader WHERE idOrder = ?";
+    public OrderHeader getOrderHeaderById(String idOrder, String idCustomer) {
+        String sql = "SELECT * FROM OrderHeader WHERE idOrder = ? AND idCustomer = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, idOrder);
+            ps.setString(2, idCustomer);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return new OrderHeader(

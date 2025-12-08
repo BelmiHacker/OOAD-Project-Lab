@@ -1,7 +1,7 @@
 package view;
 
-import controller.ProductController;
-import controller.CartItemController;
+import controller.ProductHandler;
+import controller.CartItemHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -29,8 +29,8 @@ public class CustomerProductDetailView {
 	private BorderPane mainLayout;
 	private GridPane detailGrid;
 	
-	private ProductController pc = new ProductController();
-	private CartItemController cic = new CartItemController();
+	private ProductHandler pc = new ProductHandler();
+	private CartItemHandler cic = new CartItemHandler();
 	private NavigationListener navigationListener;
 	
 	private String productId;
@@ -67,7 +67,7 @@ public class CustomerProductDetailView {
 	}
 	
 	private void loadProductDetail() {
-		product = pc.getProductById(productId);
+		product = pc.getProduct(productId);
 		if (product == null) {
 			showAlert("Error", "Produk tidak ditemukan!");
 		}
@@ -170,7 +170,7 @@ public class CustomerProductDetailView {
 			cartItem.setIdCustomer(customerId);
 			cartItem.setCount(quantity);
 			
-			String result = cic.addProductToCart("CART_" + System.currentTimeMillis(), customerId, productId, quantity);
+			String result = cic.createCartItem(customerId, productId, quantity);
 			if ("success".equals(result)) {
 				showAlert("Sukses", "Produk berhasil ditambahkan ke keranjang!");
 				quantitySpinner.getValueFactory().setValue(1);

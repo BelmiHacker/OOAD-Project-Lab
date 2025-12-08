@@ -1,10 +1,10 @@
 package view;
 
-import controller.CartItemController;
-import controller.ProductController;
-import controller.CustomerController;
-import controller.OrderController;
-import controller.PromoController;
+import controller.CartItemHandler;
+import controller.ProductHandler;
+import controller.CustomerHandler;
+import controller.OrderHandler;
+import controller.PromoHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -37,11 +37,11 @@ public class CartView {
 	private BorderPane mainLayout;
 	private TableView<CartItem> cartTable;
 	
-	private CartItemController cic = new CartItemController();
-	private ProductController pc = new ProductController();
-	private CustomerController cc = new CustomerController();
-	private OrderController oc = new OrderController();
-	private PromoController promoC = new PromoController();
+	private CartItemHandler cic = new CartItemHandler();
+	private ProductHandler pc = new ProductHandler();
+	private CustomerHandler cc = new CustomerHandler();
+	private OrderHandler oc = new OrderHandler();
+	private PromoHandler promoC = new PromoHandler();
 	
 	private String customerId;
 	private NavigationListener navigationListener;
@@ -147,7 +147,7 @@ public class CartView {
 		deleteBtn.setOnAction(e -> {
 			CartItem selected = cartTable.getSelectionModel().getSelectedItem();
 			if (selected != null) {
-				String result = cic.deleteCartItem(selected.getIdCartItem());
+				String result = cic.deleteCartItem(customerId, selected.getIdProduct());
 				if ("success".equals(result)) {
 					showAlert("Sukses", "Item dihapus dari keranjang");
 					loadCartItems();
@@ -181,7 +181,7 @@ public class CartView {
 		
 		TableColumn<CartItem, String> productCol = new TableColumn<>("Produk");
 		productCol.setCellValueFactory(cellData -> {
-			Product p = pc.getProductById(cellData.getValue().getIdProduct());
+			Product p = pc.getProduct(cellData.getValue().getIdProduct());
 			return new javafx.beans.property.SimpleStringProperty(p != null ? p.getName() : "N/A");
 		});
 		productCol.setPrefWidth(200);
@@ -192,14 +192,14 @@ public class CartView {
 		
 		TableColumn<CartItem, Double> priceCol = new TableColumn<>("Harga Satuan");
 		priceCol.setCellValueFactory(cellData -> {
-			Product p = pc.getProductById(cellData.getValue().getIdProduct());
+			Product p = pc.getProduct(cellData.getValue().getIdProduct());
 			return new javafx.beans.property.SimpleDoubleProperty(p != null ? p.getPrice() : 0).asObject();
 		});
 		priceCol.setPrefWidth(120);
 		
 		TableColumn<CartItem, Double> subtotalCol = new TableColumn<>("Subtotal");
 		subtotalCol.setCellValueFactory(cellData -> {
-			Product p = pc.getProductById(cellData.getValue().getIdProduct());
+			Product p = pc.getProduct(cellData.getValue().getIdProduct());
 			double subtotal = (p != null ? p.getPrice() : 0) * cellData.getValue().getCount();
 			return new javafx.beans.property.SimpleDoubleProperty(subtotal).asObject();
 		});
@@ -211,20 +211,14 @@ public class CartView {
 	}
 	
 	private void loadCartItems() {
-		// Get all cart items from controller
-		List<CartItem> cartItems = cic.getAllCartItems();
-		
+		// Get cart items for this customer
+		CartItem cartItems = cic.getCartItems(customerId);
+
 		if (cartItems != null) {
-			// Filter by customer ID
-			ObservableList<CartItem> items = FXCollections.observableArrayList();
-			for (CartItem ci : cartItems) {
-				if (customerId.equals(ci.getIdCustomer())) {
-					items.add(ci);
-				}
-			}
+			ObservableList<CartItem> items = FXCollections.observableArrayList(cartItems);
 			cartTable.setItems(items);
 		}
-		
+
 		updateTotalAndBalance();
 	}
 	
@@ -235,7 +229,7 @@ public class CartView {
 		
 		// Calculate total from all items in table
 		for (CartItem item : cartTable.getItems()) {
-			Product p = pc.getProductById(item.getIdProduct());
+			Product p = pc.getProduct(item.getIdProduct());
 			if (p != null) {
 				total += p.getPrice() * item.getCount();
 			}
@@ -278,7 +272,7 @@ public class CartView {
 		
 		// Calculate total amount from cart items
 		for (CartItem item : cartItems) {
-			Product p = pc.getProductById(item.getIdProduct());
+			Product p = pc.getProduct(item.getIdProduct());
 			if (p != null) {
 				total += p.getPrice() * item.getCount();
 			}

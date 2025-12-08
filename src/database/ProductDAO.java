@@ -104,6 +104,26 @@ public class ProductDAO {
         return products;
     }
 
+    public List<Product> getAvailableProducts() {
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT * FROM Product WHERE stock > 0";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                products.add(new Product(
+                        rs.getString("idProduct"),
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getInt("stock"),
+                        rs.getString("category")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
     public List<Product> getProductsByCategory(String category) {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM Product WHERE category = ?";

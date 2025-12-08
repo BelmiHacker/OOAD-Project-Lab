@@ -1,6 +1,6 @@
 package view;
 
-import controller.ProductController;
+import controller.ProductHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -27,7 +27,7 @@ public class AdminProductDetailView {
 	private BorderPane mainLayout;
 	private GridPane detailGrid;
 
-	private ProductController pc = new ProductController();
+	private ProductHandler pc = new ProductHandler();
 	private NavigationListener navigationListener;
 
 	private String productId;
@@ -67,7 +67,7 @@ public class AdminProductDetailView {
 
 	private void loadProductDetail() {
 		if (!isNew) {
-			product = pc.getProductById(productId);
+			product = pc.getProduct(productId);
 			if (product == null) {
 				showAlert("Error", "Produk tidak ditemukan!");
 				product = new Product();

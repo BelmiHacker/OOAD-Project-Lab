@@ -1,6 +1,6 @@
 package view;
 
-import controller.ProductController;
+import controller.ProductHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -32,7 +32,7 @@ public class AdminProductListView {
 	private TextField searchField;
 	private TableView<Product> productTable;
 	
-	private ProductController pc = new ProductController();
+	private ProductHandler pc = new ProductHandler();
 	private NavigationListener navigationListener;
 	
 	public AdminProductListView(String adminId) {

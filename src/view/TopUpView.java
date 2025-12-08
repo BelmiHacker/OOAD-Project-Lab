@@ -1,6 +1,6 @@
 package view;
 
-import controller.CustomerController;
+import controller.CustomerHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -25,7 +25,7 @@ public class TopUpView {
 	private BorderPane mainLayout;
 	private GridPane formLayout;
 	
-	private CustomerController cc = new CustomerController();
+	private CustomerHandler cc = new CustomerHandler();
 	
 	private String customerId;
 	private NavigationListener navigationListener;

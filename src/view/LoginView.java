@@ -1,7 +1,7 @@
 package view;
 
-import controller.UserController;
-import controller.CustomerController;
+import controller.UserHandler;
+import controller.CustomerHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -37,8 +37,8 @@ public class LoginView {
 	private Hyperlink link;
 	private Button button;
 	
-	private UserController uc = new UserController();
-	private CustomerController cc = new CustomerController();
+	private UserHandler uc = new UserHandler();
+	private CustomerHandler cc = new CustomerHandler();
 	private User loggedInUser;
 	private NavigationListener navigationListener;
 	

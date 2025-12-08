@@ -3,6 +3,8 @@ package controller;
 import model.Product;
 import database.ProductDAO;
 
+import java.util.List;
+
 /**
  * ProductController
  * 
@@ -10,14 +12,14 @@ import database.ProductDAO;
  * Bertanggung jawab untuk validasi data produk dan delegasi ke ProductDAO.
  * 
  */
-public class ProductController {
+public class ProductHandler {
     private ProductDAO productDAO;
 
     /**
      * Constructor untuk ProductController
      * Menginisialisasi ProductDAO untuk akses database
      */
-    public ProductController() {
+    public ProductHandler() {
         this.productDAO = new ProductDAO();
     }
 
@@ -46,7 +48,7 @@ public class ProductController {
      * @param idProduct ID produk yang dicari
      * @return Product object jika ditemukan, null sebaliknya
      */
-    public Product getProductById(String idProduct) {
+    public Product getProduct(String idProduct) {
         return productDAO.getProductById(idProduct);
     }
 
@@ -67,6 +69,15 @@ public class ProductController {
      */
     public java.util.List<Product> getProductsByCategory(String category) {
         return productDAO.getProductsByCategory(category);
+    }
+
+    /**
+     * Mendapatkan semua produk yang tersedia (stok > 0)
+     *
+     * @return List produk yang tersedia
+     */
+    public List<Product> getAvailableProducts() {
+        return productDAO.getAvailableProducts();
     }
 
     /**
@@ -113,5 +124,23 @@ public class ProductController {
             return "success";
         }
         return "Update produk gagal";
+    }
+
+    /**
+     * Edit stok produk
+     * Validasi memastikan stok tidak negatif
+     *
+     * @param idProduct ID produk yang stoknya akan diedit
+     * @param stock Nilai stok baru
+     * @return "success" jika edit berhasil, pesan error sebaliknya
+     */
+    public String editProductStock(String idProduct, int stock) {
+        if (stock < 0) {
+            return "Stok tidak boleh negatif";
+        }
+        if (productDAO.updateStock(idProduct, stock)) {
+            return "success";
+        }
+        return "Update stok gagal";
     }
 }
