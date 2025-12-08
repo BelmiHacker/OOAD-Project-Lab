@@ -38,6 +38,11 @@ public class CartItemHandler {
             return "Jumlah harus lebih dari 0";
         }
 
+        // check if product's stock is sufficient
+        if (productDAO.getStock(idProduct) <= 0) {
+            return "Stok produk habis, tidak dapat menambahkan ke cart";
+        }
+
         // Check existing cart item for this customer (single-item cart)
         CartItem existing = getCartItems(idCustomer);
         if (existing != null) {

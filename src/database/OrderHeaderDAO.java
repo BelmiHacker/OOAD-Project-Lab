@@ -58,17 +58,43 @@ public class OrderHeaderDAO {
      * @return boolean true jika berhasil, false jika gagal
      */
     public boolean insertOrderHeader(OrderHeader orderHeader) {
-        String sql = "INSERT INTO OrderHeader (idOrder, idCustomer, idPromo, status, orderedAt, totalAmount) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, orderHeader.getIdOrder());
-            ps.setString(2, orderHeader.getIdCustomer());
-            ps.setString(3, orderHeader.getIdPromo());
-            ps.setString(4, orderHeader.getStatus());
-            ps.setTimestamp(5, Timestamp.valueOf(orderHeader.getOrderedAt()));
-            ps.setDouble(6, orderHeader.getTotalAmount());
-            return ps.executeUpdate() > 0;
+        String sqlInsert = "INSERT INTO OrderHeader (idOrder, idCustomer, idPromo, status, orderedAt, totalAmount) VALUES (?, ?, ?, ?, ?, ?)";
+        String sqlUpdateStock = "UPDATE Product p JOIN OrderDetail od ON p.idProduct = od.idProduct SET p.stock = p.stock - od.qty WHERE od.idOrder = ?";
+        boolean previousAutoCommit = true;
+        try {
+            previousAutoCommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ps = connection.prepareStatement(sqlInsert)) {
+                ps.setString(1, orderHeader.getIdOrder());
+                ps.setString(2, orderHeader.getIdCustomer());
+                ps.setString(3, orderHeader.getIdPromo());
+                ps.setString(4, orderHeader.getStatus());
+                ps.setTimestamp(5, Timestamp.valueOf(orderHeader.getOrderedAt()));
+                ps.setDouble(6, orderHeader.getTotalAmount());
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement psUpdate = connection.prepareStatement(sqlUpdateStock)) {
+                psUpdate.setString(1, orderHeader.getIdOrder());
+                psUpdate.executeUpdate();
+            }
+
+            connection.commit();
+            connection.setAutoCommit(previousAutoCommit);
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            try {
+                connection.setAutoCommit(previousAutoCommit);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             return false;
         }
     }

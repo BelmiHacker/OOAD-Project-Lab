@@ -60,10 +60,6 @@ public class OrderHandler {
             return "Total harus lebih dari 0";
         }
 
-        if (idPromo != null && !idPromo.isEmpty() && !promoDAO.promoExists(idPromo)) {
-            return "Kode promo tidak ditemukan";
-        }
-
         double customerBalance = customerDAO.getBalance(idCustomer);
         if (customerBalance < totalAmount) {
             return "Saldo tidak mencukupi";

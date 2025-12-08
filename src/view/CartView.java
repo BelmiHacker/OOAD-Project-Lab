@@ -175,9 +175,48 @@ public class CartView {
 		// Load promos into combo
 		List<Promo> promos = promoC.getAllPromos();
 		if (promos != null) {
-			ObservableList<Promo> promoList = FXCollections.observableArrayList(promos);
-			promoCombo.setItems(promoList);
-			promoCombo.setOnAction(e -> updateTotalAndBalance());
+		    ObservableList<Promo> promoList = FXCollections.observableArrayList(promos);
+		    promoCombo.setItems(promoList);
+
+		    // Prevent user from typing arbitrary text (avoid mapping issues)
+		    promoCombo.setEditable(false);
+
+		    // Show promo.getCode() in dropdown cells
+		    promoCombo.setCellFactory(listView -> new javafx.scene.control.ListCell<Promo>() {
+		        @Override
+		        protected void updateItem(Promo item, boolean empty) {
+		            super.updateItem(item, empty);
+		            setText(empty || item == null ? "" : item.getCode());
+		        }
+		    });
+
+		    // Show promo.getCode() in the selected (button) area
+		    promoCombo.setButtonCell(new javafx.scene.control.ListCell<Promo>() {
+		        @Override
+		        protected void updateItem(Promo item, boolean empty) {
+		            super.updateItem(item, empty);
+		            setText(empty || item == null ? "" : item.getCode());
+		        }
+		    });
+
+		    // Converter so ComboBox displays code but value is a Promo object
+		    promoCombo.setConverter(new javafx.util.StringConverter<Promo>() {
+		        @Override
+		        public String toString(Promo promo) {
+		            return promo == null ? "" : promo.getCode();
+		        }
+
+		        @Override
+		        public Promo fromString(String string) {
+		            if (string == null) return null;
+		            return promoList.stream()
+		                            .filter(p -> string.equals(p.getCode()))
+		                            .findFirst()
+		                            .orElse(null);
+		        }
+		    });
+
+		    promoCombo.setOnAction(e -> updateTotalAndBalance());
 		}
 
 		// Setup button actions
@@ -324,56 +363,60 @@ public class CartView {
 
 	// Handle checkout process
 	private void checkout() {
-		if (currentProduct == null || currentItem == null) {
-			showAlert("Warning", "Keranjang belanja kosong!");
-			return;
-		}
+	    if (currentProduct == null || currentItem == null) {
+	        showAlert("Warning", "Keranjang belanja kosong!");
+	        return;
+	    }
 
-		int qty;
-		try {
-			qty = Integer.parseInt(qtyField.getText());
-			if (qty <= 0) {
-				showAlert("Warning", "Quantity harus lebih besar dari 0.");
-				return;
-			}
-		} catch (NumberFormatException ex) {
-			showAlert("Warning", "Masukkan angka valid untuk quantity.");
-			return;
-		}
+	    int qty;
+	    try {
+	        qty = Integer.parseInt(qtyField.getText());
+	        if (qty <= 0) {
+	            showAlert("Warning", "Quantity harus lebih besar dari 0.");
+	            return;
+	        }
+	    } catch (NumberFormatException ex) {
+	        showAlert("Warning", "Masukkan angka valid untuk quantity.");
+	        return;
+	    }
 
-		double balance = cc.getBalance(customerId);
-		double total = currentProduct.getPrice() * qty;
-		double discount = 0;
-		String idPromo = null;
+	    double balance = cc.getBalance(customerId);
+	    double total = currentProduct.getPrice() * qty;
+	    double discount = 0;
+	    String idPromo = null;
 
-		Promo selectedPromo = promoCombo.getSelectionModel().getSelectedItem();
-		if (selectedPromo != null) {
-			idPromo = selectedPromo.getIdPromo();
-			discount = total * (selectedPromo.getDiscountPercentage() / 100.0);
-			total = total - discount;
-		}
+	    Promo selectedPromo = promoCombo.getSelectionModel().getSelectedItem();
+	    if (selectedPromo != null) {
+	        idPromo = selectedPromo.getIdPromo();
+	        discount = total * (selectedPromo.getDiscountPercentage() / 100.0);
+	        total = total - discount;
+	    }
 
-		if (balance < total) {
-			showAlert("Error", "Saldo tidak mencukupi! Silakan top-up terlebih dahulu.");
-			return;
-		}
+	    // Normalize empty promo to null and log debug info
+	    if (idPromo != null && idPromo.trim().isEmpty()) {
+	        idPromo = null;
+	    }
 
-		String orderId = "ORD_" + System.currentTimeMillis();
-		String result = oc.checkout(orderId, customerId, idPromo, total);
+	    if (balance < total) {
+	        showAlert("Error", "Saldo tidak mencukupi! Silakan top-up terlebih dahulu.");
+	        return;
+	    }
 
-		if ("success".equals(result)) {
-			String orderDetailId = "ORDDET_" + System.currentTimeMillis() + "_" + currentItem.getIdProduct();
-			oc.addOrderDetail(orderDetailId, orderId, currentItem.getIdProduct(), qty);
+	    String orderId = "ORD_" + System.currentTimeMillis();
+	    String result = oc.checkout(orderId, customerId, idPromo, total);
 
-			showAlert("Success", "Checkout berhasil! Order ID: " + orderId);
-			// remove from cart after successful checkout
-			cic.deleteCartItem(customerId, currentItem.getIdProduct());
-			clearDisplayedItem();
-			promoCombo.getSelectionModel().clearSelection();
-			updateTotalAndBalance();
-		} else {
-			showAlert("Error", "Checkout gagal: " + result);
-		}
+	    if ("success".equals(result)) {
+	        String orderDetailId = "ORDDET_" + System.currentTimeMillis() + "_" + currentItem.getIdProduct();
+	        oc.addOrderDetail(orderDetailId, orderId, currentItem.getIdProduct(), qty);
+
+	        showAlert("Success", "Checkout berhasil! Order ID: " + orderId);
+	        cic.deleteCartItem(customerId, currentItem.getIdProduct());
+	        clearDisplayedItem();
+	        promoCombo.getSelectionModel().clearSelection();
+	        updateTotalAndBalance();
+	    } else {
+	        showAlert("Error", "Checkout gagal: " + result);
+	    }
 	}
 
 	// Show alert dialog
