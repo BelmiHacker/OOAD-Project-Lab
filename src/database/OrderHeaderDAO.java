@@ -59,42 +59,39 @@ public class OrderHeaderDAO {
      */
     public boolean insertOrderHeader(OrderHeader orderHeader) {
         String sqlInsert = "INSERT INTO OrderHeader (idOrder, idCustomer, idPromo, status, orderedAt, totalAmount) VALUES (?, ?, ?, ?, ?, ?)";
-        String sqlUpdateStock = "UPDATE Product p JOIN OrderDetail od ON p.idProduct = od.idProduct SET p.stock = p.stock - od.qty WHERE od.idOrder = ?";
-        boolean previousAutoCommit = true;
-        try {
-            previousAutoCommit = connection.getAutoCommit();
-            connection.setAutoCommit(false);
-
-            try (PreparedStatement ps = connection.prepareStatement(sqlInsert)) {
-                ps.setString(1, orderHeader.getIdOrder());
-                ps.setString(2, orderHeader.getIdCustomer());
-                ps.setString(3, orderHeader.getIdPromo());
-                ps.setString(4, orderHeader.getStatus());
-                ps.setTimestamp(5, Timestamp.valueOf(orderHeader.getOrderedAt()));
-                ps.setDouble(6, orderHeader.getTotalAmount());
-                ps.executeUpdate();
-            }
-
-            try (PreparedStatement psUpdate = connection.prepareStatement(sqlUpdateStock)) {
-                psUpdate.setString(1, orderHeader.getIdOrder());
-                psUpdate.executeUpdate();
-            }
-
-            connection.commit();
-            connection.setAutoCommit(previousAutoCommit);
-            return true;
+        try (PreparedStatement ps = connection.prepareStatement(sqlInsert)) {
+            ps.setString(1, orderHeader.getIdOrder());
+            ps.setString(2, orderHeader.getIdCustomer());
+            ps.setString(3, orderHeader.getIdPromo());
+            ps.setString(4, orderHeader.getStatus());
+            ps.setTimestamp(5, Timestamp.valueOf(orderHeader.getOrderedAt()));
+            ps.setDouble(6, orderHeader.getTotalAmount());
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            try {
-                connection.setAutoCommit(previousAutoCommit);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            return false;
+        }
+    }
+
+    /**
+     * Update stok produk berdasarkan order yang telah dibuat
+     *
+     * @param idOrderDetail ID Order Detail generated
+     * @param idOrder ID Order yang telah dibuat
+     * @param idProduct ID produk yang dipesan
+     * @param quantity Jumlah produk yang dipesan
+     * @return boolean true jika berhasil, false jika gagal
+     */
+    public boolean saveDataOrderHeader(String idOrderDetail, String idOrder, String idProduct, int quantity) {
+        String sql = "INSERT INTO OrderDetail (idOrderDetail, idOrder, idProduct, qty) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, idOrderDetail);
+            ps.setString(2, idOrder);
+            ps.setString(3, idProduct);
+            ps.setInt(4, quantity);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }
