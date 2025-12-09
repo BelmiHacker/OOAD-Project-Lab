@@ -15,8 +15,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -58,12 +56,9 @@ public class CartView {
 
 	// Buttons exposed as fields (bottom)
 	private Button checkoutBtn;
-	private Button deleteBtn;
 	private Button backBtn;
 	private Button updateBtn;
-
-	// Inline delete next to update (separate node)
-	private Button deleteInlineBtn;
+	private Button deleteBtn;
 
 	// Product display & quantity
 	private Label productNameLabel;
@@ -126,8 +121,8 @@ public class CartView {
 		qtyField.setPrefWidth(120);
 		qtyField.setStyle("-fx-font-size: 12; -fx-padding: 10;");
 		updateBtn.setStyle("-fx-font-size: 12; -fx-padding: 6 12; -fx-background-color: #2196F3; -fx-text-fill: white;");
-		deleteInlineBtn.setStyle("-fx-font-size: 12; -fx-padding: 6 12; -fx-background-color: #FF5252; -fx-text-fill: white;");
-		HBox qtyBox = new HBox(8, qtyField, updateBtn, deleteInlineBtn);
+		deleteBtn.setStyle("-fx-font-size: 12; -fx-padding: 6 12; -fx-background-color: #FF5252; -fx-text-fill: white;");
+		HBox qtyBox = new HBox(8, qtyField, updateBtn, deleteBtn);
 		qtyBox.setAlignment(Pos.CENTER_LEFT);
 		gridLayout.add(qtyLabel, 0, 2);
 		gridLayout.add(qtyBox, 1, 2);
@@ -252,7 +247,7 @@ public class CartView {
 		});
 
 		// Inline delete next to update and shared delete for bottom if needed
-		deleteInlineBtn.setOnAction(e -> performDelete());
+		deleteBtn.setOnAction(e -> performDelete());
 
 		// back action (bottom)
 		backBtn.setOnAction(e -> {
@@ -403,12 +398,11 @@ public class CartView {
 	    }
 
 	    String orderId = "ORD_" + System.currentTimeMillis();
-	    String result = oc.checkout(orderId, customerId, idPromo, total);
+		String orderDetailId = "ORDDET_" + System.currentTimeMillis() + "_" + currentItem.getIdProduct();
+		String codePromo = selectedPromo != null ? selectedPromo.getCode() : null;
+		String result = oc.checkout(orderId, orderDetailId, customerId, currentItem.getIdProduct(), codePromo, total, qty);
 
 	    if ("success".equals(result)) {
-	        String orderDetailId = "ORDDET_" + System.currentTimeMillis() + "_" + currentItem.getIdProduct();
-	        oc.addOrderDetail(orderDetailId, orderId, currentItem.getIdProduct(), qty);
-
 	        showAlert("Success", "Checkout berhasil! Order ID: " + orderId);
 	        cic.deleteCartItem(customerId, currentItem.getIdProduct());
 	        clearDisplayedItem();
@@ -448,12 +442,11 @@ public class CartView {
 
 		// initialize buttons as fields so they can be accessed from other methods/tests
 		checkoutBtn = new Button("Checkout");
-		deleteBtn = new Button("Hapus Item");
 		backBtn = new Button("Kembali");
 		updateBtn = new Button("Update");
 
 		// inline delete next to update
-		deleteInlineBtn = new Button("Hapus");
+		deleteBtn = new Button("Hapus");
 
 		// product display components
 		productNameLabel = new Label("Keranjang kosong");

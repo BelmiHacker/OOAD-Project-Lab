@@ -7,6 +7,8 @@ import database.OrderDetailDAO;
 import database.CartItemDAO;
 import database.CustomerDAO;
 import database.PromoDAO;
+import model.Product;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +24,8 @@ public class OrderHandler {
     private OrderDetailDAO orderDetailDAO;
     private CartItemDAO cartItemDAO;
     private CustomerDAO customerDAO;
-    private PromoDAO promoDAO;
+    private ProductHandler productHandler;
+    private PromoHandler promoHandler;
 
     /**
      * Constructor untuk OrderController
@@ -33,7 +36,8 @@ public class OrderHandler {
         this.orderDetailDAO = new OrderDetailDAO();
         this.cartItemDAO = new CartItemDAO();
         this.customerDAO = new CustomerDAO();
-        this.promoDAO = new PromoDAO();
+        this.productHandler = new ProductHandler();
+        this.promoHandler = new PromoHandler();
     }
 
     /**
@@ -42,12 +46,16 @@ public class OrderHandler {
      * Setelah checkout sukses, cart item customer akan dihapus
      * 
      * @param idOrder ID order yang unik
+     * @param idOrderDetail ID order detail yang unik
      * @param idCustomer ID customer yang checkout
-     * @param idPromo Kode promo (opsional, boleh null)
+     * @param idProduct ID produk yang dipesan
+     * @param promoCode Kode promo (opsional, boleh null)
      * @param totalAmount Total amount yang harus dibayar
+     * @param qty Jumlah item yang dipesan
      * @return "success" jika checkout berhasil, pesan error sebaliknya
      */
-    public String checkout(String idOrder, String idCustomer, String idPromo, double totalAmount) {
+    public String checkout(String idOrder, String idOrderDetail, String idCustomer, String idProduct, String promoCode, double totalAmount, int qty) {
+        // Validasi input
         if (idOrder == null || idOrder.isEmpty()) {
             return "Order ID tidak boleh kosong";
         }
@@ -65,11 +73,28 @@ public class OrderHandler {
             return "Saldo tidak mencukupi";
         }
 
-        OrderHeader orderHeader = new OrderHeader(idOrder, idCustomer, idPromo, "pending", 
+        // Get product berdasarkan idProduct
+        Product currentProduct = productHandler.getProduct(idProduct);
+
+        // Get promo ID berdasarkan kode promo jika ada
+        String idPromo = promoCode != null ? promoHandler.getPromo(promoCode).getIdPromo() : null;
+
+        // Buat order header baru
+        OrderHeader orderHeader = new OrderHeader(idOrder, idCustomer, idPromo, "pending",
                                                    LocalDateTime.now(), totalAmount);
-        
+
         if (!orderHeaderDAO.insertOrderHeader(orderHeader)) {
             return "Checkout gagal";
+        }
+
+        // Simpan data order header
+        if (!orderHeaderDAO.saveDataOrderHeader(idOrderDetail, idOrder, idProduct, qty)) {
+            return "Checkout gagal saat menyimpan data order";
+        }
+
+        // Update stock product
+        if (!productHandler.editProductStock(idProduct, currentProduct.getStock() - qty).equals("success")) {
+            return "Checkout gagal saat mengupdate stok produk";
         }
 
         cartItemDAO.deleteCartItemByCustomerId(idCustomer);
