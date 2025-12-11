@@ -136,20 +136,30 @@ public class CourierDetailView {
 		Button updateBtn = new Button("Update Status");
 		updateBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #FF9800; -fx-text-fill: white;");
 		updateBtn.setOnAction(e -> {
-			if (delivery != null) {
-				String currentStatus = delivery.getStatus();
-				String newStatus = "pending".equals(currentStatus) ? "in_transit" : "delivered";
-				
-				String result = dc.updateDeliveryStatus(deliveryId, newStatus);
-				if ("success".equals(result)) {
-					showAlert("Sukses", "Status pengiriman diperbarui menjadi " + newStatus);
-					delivery.setStatus(newStatus);
-					statusTF.setText(newStatus);
-				} else {
-					showAlert("Error", "Gagal update status: " + result);
-				}
-			}
+		    if (delivery != null) {
+		        String currentStatus = delivery.getStatus();
+		        String newStatus;
+
+		        if ("pending".equals(currentStatus)) {
+		            newStatus = "in progress";
+		        } else if ("in progress".equals(currentStatus)) {
+		            newStatus = "delivered";
+		        } else {
+		            showAlert("Info", "Pengiriman sudah delivered, tidak bisa di-update lagi.");
+		            return;
+		        }
+
+		        String result = dc.updateDeliveryStatus(deliveryId, newStatus);
+		        if ("success".equals(result)) {
+		            showAlert("Sukses", "Status pengiriman diperbarui menjadi " + newStatus);
+		            delivery.setStatus(newStatus);
+		            statusTF.setText(newStatus);
+		        } else {
+		            showAlert("Error", "Gagal update status: " + result);
+		        }
+		    }
 		});
+
 		
 		Button backBtn = new Button("Kembali");
 		backBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #999999; -fx-text-fill: white;");
