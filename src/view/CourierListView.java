@@ -24,102 +24,105 @@ import java.util.List;
 /**
  * CourierListView - JavaFX view untuk daftar pengiriman courier
  */
-public class CourierListView {
-	// UI Components
-	private Scene scene;
-	private BorderPane mainLayout;
-	private TableView<Delivery> deliveryTable;
+	public class CourierListView {
+	    private Scene scene;
+	    private BorderPane mainLayout;
+	    private TableView<Delivery> deliveryTable;
 
-	// Handler
-	private DeliveryController dc = new DeliveryController();
+	    private DeliveryController dc = new DeliveryController();
 
-	// State
-	private String courierId;
-	private NavigationListener navigationListener;
+	    private String courierId; // null = mode admin, != null = mode courier
+	    private NavigationListener navigationListener;
 
-	// Constructor
-	public CourierListView(String courierId) {
-		this.courierId = courierId;
-		init();
-		setupLayout();
-		loadDeliveries();
-		
-		scene = new Scene(mainLayout, 1000, 700);
-	}
+	    public CourierListView(String courierId) {
+	        this.courierId = courierId;
+	        init();
+	        setupLayout();
+	        loadDeliveries();
 
-	/**
-	 * Setup Layout
-	 */
-	private void setupLayout() {
-		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
-		
-		// Header
-		VBox header = new VBox();
-		header.setStyle("-fx-background-color: #c8dcfa; -fx-padding: 15;");
-		header.setAlignment(Pos.CENTER_LEFT);
-		
-		Label title = new Label("Daftar Pengiriman");
-		title.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-		title.setTextFill(Color.web("#333333"));
-		
-		header.getChildren().add(title);
-		mainLayout.setTop(header);
-		
-		// Table
-		setupTable();
-		mainLayout.setCenter(deliveryTable);
-		
-		// Button Panel
-		HBox buttonPanel = new HBox(10);
-		buttonPanel.setPadding(new Insets(15));
-		buttonPanel.setStyle("-fx-background-color: #f0f0f0;");
-		buttonPanel.setAlignment(Pos.CENTER_RIGHT);
-		
-		Button detailBtn = new Button("Lihat Detail");
-		detailBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #2196F3; -fx-text-fill: white;");
-		detailBtn.setOnAction(e -> {
-			Delivery selected = deliveryTable.getSelectionModel().getSelectedItem();
-			if (selected != null) {
-				if (navigationListener != null) {
-					navigationListener.navigateTo("COURIER_DETAIL", selected.getIdDelivery(), courierId);
-				}
-			} else {
-				showAlert("Warning", "Pilih pengiriman terlebih dahulu!");
-			}
-		});
-		
-		Button updateBtn = new Button("Update Status");
-		updateBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #FF9800; -fx-text-fill: white;");
-		updateBtn.setOnAction(e -> {
-			Delivery selected = deliveryTable.getSelectionModel().getSelectedItem();
-			if (selected != null) {
-				// Cycle through statuses: pending -> in_transit -> delivered
-				String currentStatus = selected.getStatus();
-				String newStatus = "pending".equals(currentStatus) ? "in_transit" : "delivered";
-				
-				String result = dc.updateDeliveryStatus(selected.getIdDelivery(), newStatus);
-				if ("success".equals(result)) {
-					showAlert("Sukses", "Status pengiriman diperbarui menjadi " + newStatus);
-					loadDeliveries();
-				} else {
-					showAlert("Error", "Gagal update status: " + result);
-				}
-			} else {
-				showAlert("Warning", "Pilih pengiriman terlebih dahulu!");
-			}
-		});
-		
-		Button logoutBtn = new Button("Logout");
-		logoutBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #999999; -fx-text-fill: white;");
-		logoutBtn.setOnAction(e -> {
-			if (navigationListener != null) {
-				navigationListener.navigateTo("LOGIN");
-			}
-		});
-		
-		buttonPanel.getChildren().addAll(detailBtn, updateBtn, logoutBtn);
-		mainLayout.setBottom(buttonPanel);
-	}
+	        scene = new Scene(mainLayout, 1000, 700);
+	    }
+
+	    private void setupLayout() {
+	        mainLayout.setStyle("-fx-background-color: #f5f5f5;");
+
+	        VBox header = new VBox();
+	        header.setStyle("-fx-background-color: #c8dcfa; -fx-padding: 15;");
+	        header.setAlignment(Pos.CENTER_LEFT);
+
+	        Label title = new Label("Daftar Pengiriman");
+	        title.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+	        title.setTextFill(Color.web("#333333"));
+
+	        header.getChildren().add(title);
+	        mainLayout.setTop(header);
+
+	        setupTable();
+	        mainLayout.setCenter(deliveryTable);
+
+	        HBox buttonPanel = new HBox(10);
+	        buttonPanel.setPadding(new Insets(15));
+	        buttonPanel.setStyle("-fx-background-color: #f0f0f0;");
+	        buttonPanel.setAlignment(Pos.CENTER_RIGHT);
+
+	        Button detailBtn = new Button("Lihat Detail");
+	        detailBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #2196F3; -fx-text-fill: white;");
+	        detailBtn.setOnAction(e -> {
+	            Delivery selected = deliveryTable.getSelectionModel().getSelectedItem();
+	            if (selected != null) {
+	                if (navigationListener != null) {
+	                    navigationListener.navigateTo("COURIER_DETAIL", selected.getIdDelivery(), courierId);
+	                }
+	            } else {
+	                showAlert("Warning", "Pilih pengiriman terlebih dahulu!");
+	            }
+	        });
+
+	        Button updateBtn = new Button("Update Status");
+	        updateBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #FF9800; -fx-text-fill: white;");
+	        updateBtn.setOnAction(e -> {
+	            Delivery selected = deliveryTable.getSelectionModel().getSelectedItem();
+	            if (selected != null) {
+	                String currentStatus = selected.getStatus();
+	                String newStatus;
+
+	                if ("pending".equals(currentStatus)) {
+	                    newStatus = "in progress";
+	                } else if ("in progress".equals(currentStatus)) {
+	                    newStatus = "delivered";
+	                } else {
+	                    showAlert("Info", "Pengiriman sudah delivered, tidak bisa di-update lagi.");
+	                    return;
+	                }
+
+	                String result = dc.updateDeliveryStatus(selected.getIdDelivery(), newStatus);
+	                if ("success".equals(result)) {
+	                    showAlert("Sukses", "Status pengiriman diperbarui menjadi " + newStatus);
+	                    loadDeliveries();
+	                } else {
+	                    showAlert("Error", "Gagal update status: " + result);
+	                }
+	            } else {
+	                showAlert("Warning", "Pilih pengiriman terlebih dahulu!");
+	            }
+	        });
+
+	        // Tombol kembali hanya untuk MODE ADMIN (courierId == null)
+	        if (courierId == null) {
+	            Button backBtn = new Button("Kembali");
+	            backBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #6c757d; -fx-text-fill: white;");
+	            backBtn.setOnAction(e -> {
+	                if (navigationListener != null) {
+	                    navigationListener.navigateTo("ADMIN_LIST");
+	                }
+	            });
+	            buttonPanel.getChildren().add(backBtn);
+	        }
+
+	        buttonPanel.getChildren().addAll(detailBtn, updateBtn);
+	        mainLayout.setBottom(buttonPanel);
+	    }
+
 
 	/**
 	 * Setup Table
@@ -158,12 +161,18 @@ public class CourierListView {
 	 * Load Deliveries
 	 */
 	private void loadDeliveries() {
-		// Get all deliveries for this courier
-		List<Delivery> deliveries = dc.getDeliveriesByCourierId(courierId);
-		if (deliveries != null) {
-			ObservableList<Delivery> items = FXCollections.observableArrayList(deliveries);
-			deliveryTable.setItems(items);
-		}
+	    List<Delivery> deliveries;
+
+	    if (courierId == null || courierId.isEmpty()) {
+	        deliveries = dc.getAllDeliveries(); 
+	    } else {
+	        deliveries = dc.getDeliveriesByCourierId(courierId);
+	    }
+
+	    if (deliveries != null) {
+	        ObservableList<Delivery> items = FXCollections.observableArrayList(deliveries);
+	        deliveryTable.setItems(items);
+	    }
 	}
 
 	/**
