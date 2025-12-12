@@ -3,6 +3,11 @@ package main;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import view.*;
+import controller.OrderHandler;
+import model.OrderHeader;
+import view.AdminOrderDetailView;
+
+
 
 /**
  * Main - Entry point aplikasi JoymarKet dengan Navigation Controller
@@ -54,13 +59,15 @@ public class Main extends Application implements NavigationListener {
                 case "ADMIN_DETAIL":
                     if (params.length > 0) {
                         currentProductId = params[0];
-                        AdminProductDetailView adminDetailView = new AdminProductDetailView(currentProductId, currentAdminId);
+                        AdminProductDetailView adminDetailView =
+                            new AdminProductDetailView(currentProductId, currentAdminId);
                         adminDetailView.setNavigationListener(this);
                         primaryStage.setScene(adminDetailView.getScene());
                         primaryStage.setWidth(900);
                         primaryStage.setHeight(700);
                     }
                     break;
+
                     
                 case "CUSTOMER_LIST":
                     if (params.length > 0) {
@@ -153,6 +160,34 @@ public class Main extends Application implements NavigationListener {
                     primaryStage.setWidth(1100);
                     primaryStage.setHeight(700);
                     break;
+                    
+                case "ADMIN_ORDER_DETAIL":
+                    if (params.length > 0) {
+                        String orderId = params[0];
+                        AdminOrderDetailView detailView = new AdminOrderDetailView(orderId);
+                        detailView.setNavigationListener(this);
+                        primaryStage.setScene(detailView.getScene());
+                        primaryStage.setWidth(900);
+                        primaryStage.setHeight(600);
+                    }
+                    break;
+
+                case "ADMIN_COURIER_LIST":
+                    CourierListView adminCourierListView = new CourierListView(null);
+                    adminCourierListView.setNavigationListener(this);
+                    primaryStage.setScene(adminCourierListView.getScene());
+                    primaryStage.setWidth(1000);
+                    primaryStage.setHeight(700);
+                    break;
+
+                case "ADMIN_VIEWALL_COURIERS":
+                    AdminCourierMasterView courierMasterView = new AdminCourierMasterView();
+                    courierMasterView.setNavigationListener(this);
+                    primaryStage.setScene(courierMasterView.getScene());
+                    primaryStage.setWidth(800);
+                    primaryStage.setHeight(600);
+                    break;
+
 
                 case "EDIT_PROFILE":
                     if (params.length > 0) {
@@ -180,7 +215,11 @@ public class Main extends Application implements NavigationListener {
             navigateTo("ADMIN_LIST");
         } else if ("ADMIN_ORDERS".equals(currentView)) {
             navigateTo("ADMIN_LIST");
-        } else if ("CUSTOMER_DETAIL".equals(currentView)) {
+        } else if ("ADMIN_ORDER_DETAIL".equals(currentView)) {
+        	navigateTo("ADMIN_ORDERS");
+        } else if ("ADMIN_VIEWALL_COURIERS".equals(currentView)) {
+            navigateTo("ADMIN_LIST");
+        }else if ("CUSTOMER_DETAIL".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
         } else if ("CART".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);

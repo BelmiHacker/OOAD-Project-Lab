@@ -87,6 +87,7 @@ public class AdminProductListView {
 		buttonPanel.setPadding(new Insets(15));
 		buttonPanel.setStyle("-fx-background-color: #f0f0f0;");
 		
+		//Button edit
 		Button editBtn = new Button("Edit");
 		editBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #2196F3; -fx-text-fill: white;");
 		editBtn.setOnAction(e -> {
@@ -108,6 +109,26 @@ public class AdminProductListView {
 			}
 		});
 		
+		// ========== BUTTON LIHAT SEMUA COURIER / PENGIRIMAN ==========
+		Button couriersBtn = new Button("Lihat Pengiriman");
+		couriersBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #4CAF50; -fx-text-fill: white;");
+		couriersBtn.setOnAction(e -> {
+		    if (navigationListener != null) {
+		        navigationListener.navigateTo("ADMIN_COURIER_LIST");
+		    }
+		});
+
+//		Button liat tipe kurir
+		Button viewCouriersBtn = new Button("Lihat Kurir");
+		viewCouriersBtn.setStyle("-fx-font-size: 12; -fx-padding: 6 20; -fx-background-color: #20C997; -fx-text-fill: white;");
+		viewCouriersBtn.setOnAction(e -> {
+		    if (navigationListener != null) {
+		        navigationListener.navigateTo("ADMIN_VIEWALL_COURIERS");
+		    }
+		});
+
+		
+		
 		Button logoutBtn = new Button("Logout");
 		logoutBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color:  #999999; -fx-text-fill: white;");
 		logoutBtn.setOnAction(e -> {
@@ -116,7 +137,7 @@ public class AdminProductListView {
 			}
 		});
 		
-		buttonPanel.getChildren().addAll(editBtn, ordersBtn, logoutBtn);
+		buttonPanel.getChildren().addAll(editBtn, ordersBtn, couriersBtn, viewCouriersBtn, logoutBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
 
