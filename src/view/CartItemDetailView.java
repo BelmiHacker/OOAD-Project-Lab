@@ -3,7 +3,6 @@ package view;
 import controller.CartItemHandler;
 import controller.ProductHandler;
 import controller.CustomerHandler;
-import controller.PromoHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -15,29 +14,28 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.util.StringConverter;
 import model.CartItem;
 import model.Product;
-import model.Promo;
 
 import java.util.List;
 
-/*
+/**
  * CartItemDetailView - page to view/update/delete a single cart item.
- * Constructor requires customerId and productId. The view will load data for that product.
+ * Constructor requires cartId and productId.
+ * cartId is used to fetch cart quantity; productId is used to fetch product details.
  */
 public class CartItemDetailView {
+	// UI
 	private Scene scene;
 	private BorderPane mainLayout;
 
+	// handlers
 	private CartItemHandler cic = new CartItemHandler();
 	private ProductHandler pc = new ProductHandler();
 	private CustomerHandler cc = new CustomerHandler();
-	private PromoHandler promoC = new PromoHandler();
 
-	private String customerId;
+	// state
+	private String cartId; // cart id used to fetch cart items and balance
 	private CartItem currentItem;
 	private Product currentProduct;
 
@@ -46,10 +44,8 @@ public class CartItemDetailView {
 	private Label priceLabel;
 	private Label subtotalLabel;
 	private TextField qtyField;
-	private ComboBox<Promo> promoCombo;
 	private Label totalLabel;
 	private Label balanceLabel;
-	private Label discountLabel;
 	private Button updateBtn;
 	private Button deleteBtn;
 	private Button backBtn;
@@ -58,9 +54,9 @@ public class CartItemDetailView {
 	private Runnable onUpdated;
 	private NavigationListener navigationListener;
 
-	// constructor requires customerId and productId
-	public CartItemDetailView(String customerId, String productId) {
-		this.customerId = customerId;
+	// constructor requires cartId and productId
+	public CartItemDetailView(String cartId, String productId) {
+		this.cartId = cartId;
 		init();
 		setupLayout();
 		scene = new Scene(mainLayout, 600, 450);
@@ -68,21 +64,21 @@ public class CartItemDetailView {
 		loadForProduct(productId);
 	}
 
+	// initialize UI components
 	private void init() {
 		mainLayout = new BorderPane();
 		productNameLabel = new Label();
 		priceLabel = new Label();
 		subtotalLabel = new Label();
 		qtyField = new TextField();
-		promoCombo = new ComboBox<>();
 		totalLabel = new Label();
 		balanceLabel = new Label();
-		discountLabel = new Label();
 		updateBtn = new Button("Update");
 		deleteBtn = new Button("Hapus");
 		backBtn = new Button("Kembali");
 	}
 
+	// setup layout and styling
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 		GridPane grid = new GridPane();
@@ -116,20 +112,12 @@ public class CartItemDetailView {
 		grid.add(subtotalLbl, 0, 3);
 		grid.add(subtotalLabel, 1, 3);
 
-		Label promoLbl = new Label("Pilih Promo (Opsional):");
-		promoLbl.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-		promoCombo.setPrefWidth(250);
-		grid.add(promoLbl, 0, 4);
-		grid.add(promoCombo, 1, 4);
-
 		VBox totalsBox = new VBox(6);
 		totalsBox.setAlignment(Pos.CENTER_RIGHT);
 		balanceLabel.setFont(Font.font("Arial", 12));
-		discountLabel.setFont(Font.font("Arial", 11));
-		discountLabel.setTextFill(Color.web("#FF9800"));
 		totalLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-		totalsBox.getChildren().addAll(balanceLabel, discountLabel, totalLabel);
-		grid.add(totalsBox, 1, 5);
+		totalsBox.getChildren().addAll(balanceLabel, totalLabel);
+		grid.add(totalsBox, 1, 4);
 
 		mainLayout.setCenter(grid);
 
@@ -138,43 +126,9 @@ public class CartItemDetailView {
 		bottom.setAlignment(Pos.CENTER_RIGHT);
 		mainLayout.setBottom(bottom);
 
-		// load promos
-		List<Promo> promos = promoC.getAllPromos();
-		if (promos != null) {
-			ObservableList<Promo> promoList = FXCollections.observableArrayList(promos);
-			promoCombo.setItems(promoList);
-			promoCombo.setEditable(false);
-			promoCombo.setCellFactory(lv -> new ListCell<>() {
-				@Override
-				protected void updateItem(Promo item, boolean empty) {
-					super.updateItem(item, empty);
-					setText(empty || item == null ? "" : item.getCode());
-				}
-			});
-			promoCombo.setButtonCell(new ListCell<>() {
-				@Override
-				protected void updateItem(Promo item, boolean empty) {
-					super.updateItem(item, empty);
-					setText(empty || item == null ? "" : item.getCode());
-				}
-			});
-			promoCombo.setConverter(new StringConverter<>() {
-				@Override
-				public String toString(Promo promo) {
-					return promo == null ? "" : promo.getCode();
-				}
-				@Override
-				public Promo fromString(String string) {
-					if (string == null) return null;
-					return promoList.stream().filter(p -> string.equals(p.getCode())).findFirst().orElse(null);
-				}
-			});
-			promoCombo.setOnAction(e -> updateTotals());
-		}
-
 		// actions
-		updateBtn.setOnAction(e -> doUpdate());
-		deleteBtn.setOnAction(e -> doDelete());
+		updateBtn.setOnAction(e -> editCartItem());
+		deleteBtn.setOnAction(e -> deleteCartItem());
 		backBtn.setOnAction(e -> {
 			if (navigationListener != null) {
 				navigationListener.goBack();
@@ -187,6 +141,7 @@ public class CartItemDetailView {
 		this.onUpdated = onUpdated;
 	}
 
+	// caller should set this to enable navigation
 	public void setNavigationListener(NavigationListener navigationListener) {
 		this.navigationListener = navigationListener;
 	}
@@ -196,13 +151,12 @@ public class CartItemDetailView {
 	 * Returns true when item was found and UI populated.
 	 */
 	public boolean loadForProduct(String productId) {
-		// try to fetch cart item for this customer/product from DB by scanning cart items
 		this.currentItem = null;
 		try {
-			List<CartItem> items = cic.getCartItems(customerId);
+			List<CartItem> items = cic.getCartItems(cartId);
 			if (items != null) {
 				for (CartItem ci : items) {
-					if (ci.getIdProduct() == productId) {
+					if (productId != null && productId.equals(String.valueOf(ci.getIdProduct()))) {
 						this.currentItem = ci;
 						break;
 					}
@@ -213,7 +167,7 @@ public class CartItemDetailView {
 		}
 
 		if (this.currentItem == null) {
-			// still try to load product info so UI won't crash
+			// load product by string id
 			this.currentProduct = pc.getProduct(productId);
 			if (this.currentProduct == null) {
 				productNameLabel.setText("Produk tidak ditemukan");
@@ -232,7 +186,7 @@ public class CartItemDetailView {
 			return false;
 		}
 		// found cart item -> load product and populate UI
-		this.currentProduct = pc.getProduct(this.currentItem.getIdProduct());
+		this.currentProduct = pc.getProduct(String.valueOf(this.currentItem.getIdProduct()));
 		loadItem();
 		return true;
 	}
@@ -252,10 +206,10 @@ public class CartItemDetailView {
 		updateTotals();
 	}
 
+	// update balance and total labels
 	private void updateTotals() {
-		double balance = cc.getBalance(customerId);
+		double balance = cc.getBalance(cartId);
 		double total = 0;
-		double discount = 0;
 		int qty = 0;
 		double unitPrice = currentProduct != null ? currentProduct.getPrice() : 0;
 
@@ -266,20 +220,14 @@ public class CartItemDetailView {
 			qty = currentItem != null ? currentItem.getCount() : 0;
 		}
 		total = unitPrice * qty;
-		Promo selectedPromo = promoCombo.getSelectionModel().getSelectedItem();
-		if (selectedPromo != null) {
-			discount = total * (selectedPromo.getDiscountPercentage() / 100.0);
-			total = total - discount;
-		}
 
 		balanceLabel.setText("Saldo Anda: Rp " + String.format("%.0f", balance));
-		if (discount > 0) discountLabel.setText("Diskon: -Rp " + String.format("%.0f", discount));
-		else discountLabel.setText("Diskon: Rp 0");
 		totalLabel.setText("Total Belanja: Rp " + String.format("%.0f", total));
 		if (balance < total) totalLabel.setTextFill(Color.RED); else totalLabel.setTextFill(Color.GREEN);
 	}
 
-	private void doUpdate() {
+	// update cart item quantity
+	private void editCartItem() {
 		if (currentItem == null || currentProduct == null) {
 			showAlert("Warning", "Tidak ada item untuk diupdate.");
 			return;
@@ -291,7 +239,7 @@ public class CartItemDetailView {
 		} catch (NumberFormatException ex) {
 			showAlert("Warning", "Masukkan angka valid untuk quantity."); return;
 		}
-		String res = cic.editCartItem(customerId, currentItem.getIdProduct(), newQty);
+		String res = cic.editCartItem(currentItem.getIdCustomer(), currentItem.getIdProduct(), newQty);
 		if ("success".equals(res)) {
 			showAlert("Sukses", "Quantity diperbarui.");
 			if (onUpdated != null) onUpdated.run();
@@ -303,12 +251,13 @@ public class CartItemDetailView {
 		}
 	}
 
-	private void doDelete() {
+	// delete cart item
+	private void deleteCartItem() {
 		if (currentItem == null) {
 			showAlert("Warning", "Tidak ada item yang dipilih.");
 			return;
 		}
-		String res = cic.deleteCartItem(customerId, currentItem.getIdProduct());
+		String res = cic.deleteCartItem(currentItem.getIdCustomer(), currentItem.getIdProduct());
 		if ("success".equals(res)) {
 			showAlert("Sukses", "Item dihapus dari keranjang");
 			if (onUpdated != null) onUpdated.run();
@@ -320,6 +269,7 @@ public class CartItemDetailView {
 		}
 	}
 
+	// show alert dialog
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
@@ -327,6 +277,7 @@ public class CartItemDetailView {
 		alert.showAndWait();
 	}
 
+	// Getter Setter
 	public Scene getScene() {
 		return scene;
 	}

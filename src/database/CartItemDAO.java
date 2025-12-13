@@ -121,6 +121,33 @@ public class CartItemDAO {
     }
 
     /**
+     * Mendapatkan CartItem berdasarkan idCustomer dan idProduct
+     *
+     * @param idCustomer ID dari Customer yang dicari
+     * @param idProduct ID dari Product yang dicari
+     * @return CartItem object jika ditemukan, null jika tidak ditemukan
+     */
+    public CartItem getCartItemByCustomerIdAndProductId(String idCustomer, String idProduct) {
+        String sql = "SELECT * FROM CartItem WHERE idCustomer = ? AND idProduct = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, idCustomer);
+            ps.setString(2, idProduct);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new CartItem(
+                        rs.getString("idCartItem"),
+                        rs.getString("idCustomer"),
+                        rs.getString("idProduct"),
+                        rs.getInt("count")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * Mendapatkan semua CartItem dari database
      *
      * @return List<CartItem> daftar semua CartItem

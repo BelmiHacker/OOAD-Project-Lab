@@ -21,6 +21,7 @@ public class Main extends Application implements NavigationListener {
     private String currentCustomerId = "CUST_00001";  // Will be set by login
     private String currentCourierId = null;  // Will be set by login
     private String currentProductId = null;
+    private String currentCartId = null;
 
     /**
      * Memulai aplikasi dan menampilkan jendela utama
@@ -121,13 +122,13 @@ public class Main extends Application implements NavigationListener {
 
                 case "CART_DETAIL":
                     if (params.length > 1) {
-                        String cartItemId = params[0];
-                        currentCustomerId = params[1];
-                        CartItemDetailView cartItemDetailView = new CartItemDetailView(currentCustomerId, currentProductId);
+                        currentCartId = params[0];
+                        String currentCartProductId = params[1];
+                        CartItemDetailView cartItemDetailView = new CartItemDetailView(currentCartId, currentCartProductId);
                         cartItemDetailView.setNavigationListener(this);
                         primaryStage.setScene(cartItemDetailView.getScene());
                         primaryStage.setWidth(600);
-                        primaryStage.setHeight(450);
+                        primaryStage.setHeight(700);
                     }
                     break;
                     

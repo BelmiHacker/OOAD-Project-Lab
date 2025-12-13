@@ -45,18 +45,32 @@ public class CartItemHandler {
             return "Stok produk habis, tidak dapat menambahkan ke cart";
         }
 
-    // No existing item -> normal insert flow
-    int availableStock = productDAO.getStock(idProduct);
-    if (count > availableStock) {
-        return "Jumlah melebihi stok yang tersedia";
-    }
+        // No existing item -> normal insert flow
+        int availableStock = productDAO.getStock(idProduct);
+        if (count > availableStock) {
+            return "Jumlah melebihi stok yang tersedia";
+        }
 
-    CartItem cartItem = new CartItem("CART_" + System.currentTimeMillis(), idCustomer, idProduct, count);
-    if (cartItemDAO.insertCartItem(cartItem)) {
-        return "success";
+        // Already exists -> update count
+        CartItem existingItem = cartItemDAO.getCartItemByCustomerIdAndProductId(idCustomer, idProduct);
+        if (existingItem != null) {
+            int newCount = existingItem.getCount() + count;
+            if (newCount > availableStock) {
+                return "Jumlah melebihi stok yang tersedia";
+            }
+            if (cartItemDAO.updateCount(idCustomer, idProduct, newCount)) {
+                return "success";
+            } else {
+                return "Tambah ke cart gagal";
+            }
+        }
+
+        CartItem cartItem = new CartItem("CART_" + System.currentTimeMillis(), idCustomer, idProduct, count);
+        if (cartItemDAO.insertCartItem(cartItem)) {
+            return "success";
+        }
+        return "Tambah ke cart gagal";
     }
-    return "Tambah ke cart gagal";
-}
     /**
      * Update jumlah produk dalam cart item
      * Validasi memastikan jumlah valid dan stok tersedia
