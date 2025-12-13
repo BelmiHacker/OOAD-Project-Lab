@@ -1,20 +1,13 @@
 package view;
 
-import controller.CartItemHandler;
-import controller.ProductHandler;
-import controller.CustomerHandler;
-import controller.OrderHandler;
-import controller.PromoHandler;
+import controller.*;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -22,53 +15,40 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.util.StringConverter;
 import model.CartItem;
 import model.Product;
 import model.Promo;
+
 import java.util.List;
 
 /**
- * CartView - JavaFX view untuk keranjang belanja customer (single item)
- * Styled to match AdminProductDetailView / ProfileView consistency
+ * CartView - JavaFX view untuk menampilkan dan mengelola keranjang belanja customer
  */
 public class CartView {
-	// UI Components
+	// UI
 	private Scene scene;
 	private BorderPane mainLayout;
-	private GridPane gridLayout;
 
 	// Handlers
 	private CartItemHandler cic = new CartItemHandler();
 	private ProductHandler pc = new ProductHandler();
 	private CustomerHandler cc = new CustomerHandler();
-	private OrderHandler oc = new OrderHandler();
 	private PromoHandler promoC = new PromoHandler();
 
-	// State
 	private String customerId;
+	private Runnable onUpdated;
+
+	// Navigation
 	private NavigationListener navigationListener;
 
-	// UI Elements
+	// UI
+	private TableView<CartItem> table;
 	private Label totalLabel;
 	private Label balanceLabel;
 	private Label discountLabel;
-	private ComboBox<Promo> promoCombo;
-
-	// Buttons exposed as fields (bottom)
 	private Button checkoutBtn;
-	private Button backBtn;
-	private Button updateBtn;
-	private Button deleteBtn;
-
-	// Product display & quantity
-	private Label productNameLabel;
-	private Label priceLabel;
-	private Label subtotalLabel;
-	private TextField qtyField;
-
-	// currently displayed item/product
-	private CartItem currentItem;
-	private Product currentProduct;
+	private ComboBox<Promo> promoCombo;
 
 	// Constructor
 	public CartView(String customerId) {
@@ -76,15 +56,27 @@ public class CartView {
 		init();
 		setupLayout();
 		loadCartItems();
-		scene = new Scene(mainLayout, 900, 700);
+		scene = new Scene(mainLayout, 900, 600);
 	}
 
-	// Setup layout dan styling JavaFX (consistent with AdminProductDetailView)
+	// Initialize UI components
+	private void init() {
+		mainLayout = new BorderPane();
+
+		table = new TableView<>();
+		totalLabel = new Label();
+		balanceLabel = new Label();
+		discountLabel = new Label();
+		checkoutBtn = new Button("Checkout");
+		promoCombo = new ComboBox<>();
+	}
+
+	// Setup layout and styling
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 
-		// Header (title only)
-		HBox header = new HBox();
+		// Header
+		HBox header = new HBox(12);
 		header.setStyle("-fx-background-color: #c8dcfa; -fx-padding: 15;");
 		header.setAlignment(Pos.CENTER_LEFT);
 
@@ -92,325 +84,328 @@ public class CartView {
 		title.setFont(Font.font("Arial", FontWeight.BOLD, 24));
 		title.setTextFill(Color.web("#333333"));
 
-		header.getChildren().add(title);
+		header.getChildren().addAll(title);
 		mainLayout.setTop(header);
 
-		// Grid layout centered content (match padding/gaps)
-		gridLayout.setPadding(new Insets(40, 60, 40, 60));
-		gridLayout.setHgap(20);
-		gridLayout.setVgap(15);
-		gridLayout.setStyle("-fx-background-color: #f5f5f5;");
+		// Table columns
+		TableColumn<CartItem, String> nameCol = new TableColumn<>("Produk");
+		nameCol.setCellValueFactory(cell -> {
+			Product p = pc.getProduct(cell.getValue().getIdProduct());
+			String nm = p != null ? p.getName() : "Produk tidak ditemukan";
+			return new javafx.beans.property.SimpleStringProperty(nm);
+		});
+		nameCol.setPrefWidth(300);
 
-		// Product Name row
-		Label productLabel = new Label("Produk:");
-		productLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-		productNameLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
-		gridLayout.add(productLabel, 0, 0);
-		gridLayout.add(productNameLabel, 1, 0);
+		TableColumn<CartItem, String> priceCol = new TableColumn<>("Harga");
+		priceCol.setCellValueFactory(cell -> {
+			Product p = pc.getProduct(cell.getValue().getIdProduct());
+			double v = p != null ? p.getPrice() : 0;
+			return new javafx.beans.property.SimpleStringProperty("Rp " + String.format("%.0f", v));
+		});
+		priceCol.setPrefWidth(140);
 
-		// Price row
-		Label priceLbl = new Label("Harga Satuan:");
-		priceLbl.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-		priceLabel.setFont(Font.font("Arial", 12));
-		gridLayout.add(priceLbl, 0, 1);
-		gridLayout.add(priceLabel, 1, 1);
+		TableColumn<CartItem, Integer> qtyCol = new TableColumn<>("Qty");
+		qtyCol.setCellValueFactory(cell -> new javafx.beans.property.SimpleIntegerProperty(cell.getValue().getCount()).asObject());
+		qtyCol.setPrefWidth(80);
 
-		// Quantity row with update and inline delete buttons
-		Label qtyLabel = new Label("Quantity:");
-		qtyLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-		qtyField.setPrefWidth(120);
-		qtyField.setStyle("-fx-font-size: 12; -fx-padding: 10;");
-		updateBtn.setStyle("-fx-font-size: 12; -fx-padding: 6 12; -fx-background-color: #2196F3; -fx-text-fill: white;");
-		deleteBtn.setStyle("-fx-font-size: 12; -fx-padding: 6 12; -fx-background-color: #FF5252; -fx-text-fill: white;");
-		HBox qtyBox = new HBox(8, qtyField, updateBtn, deleteBtn);
-		qtyBox.setAlignment(Pos.CENTER_LEFT);
-		gridLayout.add(qtyLabel, 0, 2);
-		gridLayout.add(qtyBox, 1, 2);
+		TableColumn<CartItem, String> subtotalCol = new TableColumn<>("Subtotal");
+		subtotalCol.setCellValueFactory(cell -> {
+			Product p = pc.getProduct(cell.getValue().getIdProduct());
+			double v = p != null ? p.getPrice() * cell.getValue().getCount() : 0;
+			return new javafx.beans.property.SimpleStringProperty("Rp " + String.format("%.0f", v));
+		});
+		subtotalCol.setPrefWidth(160);
 
-		// Subtotal row
-		Label subtotalLbl = new Label("Subtotal:");
-		subtotalLbl.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-		subtotalLabel.setFont(Font.font("Arial", 12));
-		gridLayout.add(subtotalLbl, 0, 3);
-		gridLayout.add(subtotalLabel, 1, 3);
+		// Action column with Edit and Delete buttons
+		TableColumn<CartItem, Void> actionCol = new TableColumn<>("Aksi");
+		actionCol.setPrefWidth(160);
+		actionCol.setCellFactory(col -> new TableCell<>() {
+			private final Button editBtn = new Button("Edit");
+			private final Button delBtn = new Button("Hapus");
+			private final HBox box = new HBox(8, editBtn, delBtn);
 
-		// Promo selection row
-		Label promoLbl = new Label("Pilih Promo (Opsional):");
-		promoLbl.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-		promoCombo.setPrefWidth(250);
-		gridLayout.add(promoLbl, 0, 4);
-		gridLayout.add(promoCombo, 1, 4);
+			{
+				box.setAlignment(Pos.CENTER_LEFT);
+				editBtn.setOnAction(e -> {
+					CartItem item = getTableView().getItems().get(getIndex());
+					openEdit(item);
+				});
+				delBtn.setOnAction(e -> {
+					CartItem item = getTableView().getItems().get(getIndex());
+					String res = cic.deleteCartItem(customerId, item.getIdProduct());
+					if ("success".equals(res)) {
+						loadCartItems();
+						showAlert("Sukses", "Item dihapus dari keranjang");
+					} else {
+						showAlert("Error", "Gagal menghapus: " + res);
+					}
+				});
+			}
 
-		// Totals area (checkout moved to bottom panel)
-		VBox totalsBox = new VBox(8);
-		totalsBox.setAlignment(Pos.CENTER_RIGHT);
+			@Override
+			protected void updateItem(Void unused, boolean empty) {
+				super.updateItem(unused, empty);
+				setGraphic(empty ? null : box);
+			}
+		});
+
+		table.getColumns().addAll(nameCol, priceCol, qtyCol, subtotalCol, actionCol);
+
+		VBox center = new VBox(12, table);
+		center.setPadding(new Insets(20));
+		mainLayout.setCenter(center);
+
+		// Totals area at bottom
+		VBox totalsBox = new VBox(6);
+		totalsBox.setPadding(new Insets(10));
+		totalLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 		balanceLabel.setFont(Font.font("Arial", 12));
 		discountLabel.setFont(Font.font("Arial", 11));
 		discountLabel.setTextFill(Color.web("#FF9800"));
-		totalLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 		totalsBox.getChildren().addAll(balanceLabel, discountLabel, totalLabel);
-		gridLayout.add(totalsBox, 1, 5);
 
-		mainLayout.setCenter(gridLayout);
+		// Buttons
+		checkoutBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #FFEB3B; -fx-text-fill: black;");
 
-		// Button Panel at bottom (match TopUpView style: right aligned Back + Checkout)
-		HBox buttonPanel = new HBox(10);
-		buttonPanel.setPadding(new Insets(15));
-		buttonPanel.setAlignment(Pos.CENTER_RIGHT);
-		buttonPanel.setStyle("-fx-background-color: #f0f0f0;");
+		checkoutBtn.setOnAction(e -> {
+			checkout();
+		});
 
-		// Style bottom buttons to match TopUpView
+		Button backBtn = new Button("Kembali");
 		backBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #999999; -fx-text-fill: white;");
-		checkoutBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #4CAF50; -fx-text-fill: white;");
+		backBtn.setOnAction(e -> {
+			if (navigationListener != null) {
+				navigationListener.goBack();
+			} else {
+				showAlert("Error", "Navigation listener not set. Cannot go back.");
+			}
+		});
 
-		// Add Back then Checkout (same order as TopUpView)
-		buttonPanel.getChildren().addAll(backBtn, checkoutBtn);
-		mainLayout.setBottom(buttonPanel);
+		HBox buttonRow = new HBox(10);
+		buttonRow.setAlignment(Pos.CENTER_RIGHT);
+		Region btnSpacer = new Region();
+		HBox.setHgrow(btnSpacer, Priority.ALWAYS);
+		buttonRow.getChildren().addAll(btnSpacer, backBtn, checkoutBtn);
+
+		// Promo box on the left (new)
+		VBox promoBox = new VBox(6);
+		promoBox.setPadding(new Insets(10, 0, 0, 10));
+		Label promoLbl = new Label("Pilih Promo (Opsional):");
+		promoLbl.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+		promoCombo.setPrefWidth(220);
+		promoBox.getChildren().addAll(promoLbl, promoCombo);
 
 		// Load promos into combo
 		List<Promo> promos = promoC.getAllPromos();
 		if (promos != null) {
-		    ObservableList<Promo> promoList = FXCollections.observableArrayList(promos);
-		    promoCombo.setItems(promoList);
+			ObservableList<Promo> promoList = FXCollections.observableArrayList();
+			// insert a null item representing "None" / no promo
+			promoList.add(null);
+			promoList.addAll(promos);
+			promoCombo.setItems(promoList);
+			promoCombo.setEditable(false);
 
-		    // Prevent user from typing arbitrary text (avoid mapping issues)
-		    promoCombo.setEditable(false);
-
-		    // Show promo.getCode() in dropdown cells
-		    promoCombo.setCellFactory(listView -> new javafx.scene.control.ListCell<Promo>() {
-		        @Override
-		        protected void updateItem(Promo item, boolean empty) {
-		            super.updateItem(item, empty);
-		            setText(empty || item == null ? "" : item.getCode());
-		        }
-		    });
-
-		    // Show promo.getCode() in the selected (button) area
-		    promoCombo.setButtonCell(new javafx.scene.control.ListCell<Promo>() {
-		        @Override
-		        protected void updateItem(Promo item, boolean empty) {
-		            super.updateItem(item, empty);
-		            setText(empty || item == null ? "" : item.getCode());
-		        }
-		    });
-
-		    // Converter so ComboBox displays code but value is a Promo object
-		    promoCombo.setConverter(new javafx.util.StringConverter<Promo>() {
-		        @Override
-		        public String toString(Promo promo) {
-		            return promo == null ? "" : promo.getCode();
-		        }
-
-		        @Override
-		        public Promo fromString(String string) {
-		            if (string == null) return null;
-		            return promoList.stream()
-		                            .filter(p -> string.equals(p.getCode()))
-		                            .findFirst()
-		                            .orElse(null);
-		        }
-		    });
-
-		    promoCombo.setOnAction(e -> updateTotalAndBalance());
-		}
-
-		// Setup button actions
-		updateBtn.setOnAction(e -> {
-			if (currentItem == null || currentProduct == null) {
-				showAlert("Warning", "Tidak ada item untuk diupdate.");
-				return;
-			}
-			String txt = qtyField.getText();
-			int newQty;
-			try {
-				newQty = Integer.parseInt(txt);
-				if (newQty <= 0) {
-					showAlert("Warning", "Quantity harus lebih besar dari 0.");
-					return;
+			// show "(None)" when item is null
+			promoCombo.setCellFactory(lv -> new ListCell<>() {
+				@Override
+				protected void updateItem(Promo item, boolean empty) {
+					super.updateItem(item, empty);
+					if (empty) {
+						setText("");
+					} else if (item == null) {
+						setText("(None)");
+					} else {
+						setText(item.getCode());
+					}
 				}
-			} catch (NumberFormatException ex) {
-				showAlert("Warning", "Masukkan angka valid untuk quantity.");
-				return;
-			}
+			});
+			promoCombo.setButtonCell(new ListCell<>() {
+				@Override
+				protected void updateItem(Promo item, boolean empty) {
+					super.updateItem(item, empty);
+					if (empty) {
+						setText("");
+					} else if (item == null) {
+						setText("(None)");
+					} else {
+						setText(item.getCode());
+					}
+				}
+			});
+			promoCombo.setConverter(new StringConverter<>() {
+				@Override
+				public String toString(Promo promo) {
+					return promo == null ? "(None)" : promo.getCode();
+				}
+				@Override
+				public Promo fromString(String string) {
+					if (string == null) return null;
+					// try to match code to existing promos; fall back to null meaning none
+					for (Promo p : promoCombo.getItems()) {
+						if (p != null && string.equals(p.getCode())) return p;
+					}
+					return null;
+				}
+			});
+			promoCombo.setOnAction(e -> updateTotals());
+			// default to "(None)"
+			promoCombo.getSelectionModel().selectFirst();
+		}
 
-			String res = cic.editCartItem(customerId, currentItem.getIdProduct(), newQty);
-			if ("success".equals(res)) {
-				try {
-					currentItem = cic.getCartItemById(currentItem.getIdCartItem());
-				} catch (Exception ignore) {}
-				if (currentItem != null) currentItem.setCount(newQty);
-				showAlert("Sukses", "Quantity diperbarui.");
-				updateTotalAndBalance();
-			} else {
-				showAlert("Error", "Gagal mengupdate: " + res);
-			}
-		});
+		// Bottom layout: promo on left, spacer, totals on right
+		HBox bottomRow = new HBox(10);
+		bottomRow.setPadding(new Insets(0, 10, 0, 10));
+		bottomRow.setAlignment(Pos.CENTER_LEFT);
+		Region spacer = new Region();
+		HBox.setHgrow(spacer, Priority.ALWAYS);
+		bottomRow.getChildren().addAll(promoBox, spacer, totalsBox);
 
-		// Inline delete next to update and shared delete for bottom if needed
-		deleteBtn.setOnAction(e -> performDelete());
+		VBox bottom = new VBox(8);
+		bottom.setPadding(new Insets(12));
+		bottom.setAlignment(Pos.CENTER_RIGHT);
+		bottom.getChildren().addAll(bottomRow, buttonRow);
 
-		// back action (bottom)
-		backBtn.setOnAction(e -> {
-			if (navigationListener != null) {
-				navigationListener.goBack();
-			}
-		});
-
-		// checkout (bottom)
-		checkoutBtn.setOnAction(e -> checkout());
+		mainLayout.setBottom(bottom);
 	}
 
-	// shared delete implementation
-	private void performDelete() {
-		if (currentItem == null) {
-			showAlert("Warning", "Tidak ada item yang dipilih.");
-			return;
-		}
-		String result = cic.deleteCartItem(customerId, currentItem.getIdProduct());
-		if ("success".equals(result)) {
-			showAlert("Sukses", "Item dihapus dari keranjang");
-			clearDisplayedItem();
-			updateTotalAndBalance();
-		} else {
-			showAlert("Error", "Gagal menghapus item: " + result);
-		}
-	}
-
-	// Load cart items from handler (expecting single item scenario)
+	// Load cart items from DB
 	private void loadCartItems() {
 		try {
-			CartItem items = cic.getCartItems(customerId);
-			if (items != null) {
-				currentItem = items;
-				currentProduct = pc.getProduct(currentItem.getIdProduct());
-				if (currentProduct != null) {
-					productNameLabel.setText(currentProduct.getName());
-					priceLabel.setText("Rp " + String.format("%.0f", currentProduct.getPrice()));
-					qtyField.setText(String.valueOf(currentItem.getCount()));
-					subtotalLabel.setText("Rp " + String.format("%.0f", currentProduct.getPrice() * currentItem.getCount()));
-				} else {
-					productNameLabel.setText("Produk tidak ditemukan");
-					priceLabel.setText("");
-					qtyField.setText("0");
-					subtotalLabel.setText("");
-				}
-			} else {
-				clearDisplayedItem();
-			}
+			List<CartItem> items = cic.getCartItems(customerId);
+			ObservableList<CartItem> list = FXCollections.observableArrayList();
+			if (items != null) list.addAll(items);
+			table.setItems(list);
 		} catch (Exception ex) {
-			clearDisplayedItem();
+			table.setItems(FXCollections.observableArrayList());
 		}
-		updateTotalAndBalance();
+		updateTotals();
 	}
 
-	private void clearDisplayedItem() {
-		currentItem = null;
-		currentProduct = null;
-		productNameLabel.setText("Keranjang kosong");
-		priceLabel.setText("");
-		qtyField.setText("");
-		subtotalLabel.setText("");
-	}
-
-	// Update total amount and customer balance display
-	private void updateTotalAndBalance() {
+	// Update totals display
+	private void updateTotals() {
 		double balance = cc.getBalance(customerId);
 		double total = 0;
 		double discount = 0;
-
-		int qty = 0;
-		double unitPrice = 0;
-		if (currentProduct != null) {
-			try {
-				qty = Integer.parseInt(qtyField.getText());
-				if (qty < 0) qty = 0;
-			} catch (Exception ex) {
-				qty = currentItem != null ? currentItem.getCount() : 0;
-			}
-			unitPrice = currentProduct.getPrice();
-			total = unitPrice * qty;
-			subtotalLabel.setText("Subtotal: Rp " + String.format("%.0f", total));
-		} else {
-			subtotalLabel.setText("");
+		for (CartItem ci : table.getItems()) {
+			Product p = pc.getProduct(ci.getIdProduct());
+			if (p != null) total += p.getPrice() * ci.getCount();
 		}
 
-		// Apply promo if selected
+		// apply promo discount if any
 		Promo selectedPromo = promoCombo.getSelectionModel().getSelectedItem();
 		if (selectedPromo != null) {
-			discount = total * (selectedPromo.getDiscountPercentage() / 100.0);
-			total = total - discount;
+			double pct = selectedPromo.getDiscountPercentage();
+			discount = total * (pct / 100.0);
 		}
 
+		double totalAfterDiscount = total - discount;
+
+		// update labels
 		balanceLabel.setText("Saldo Anda: Rp " + String.format("%.0f", balance));
-		if (discount > 0) {
-			discountLabel.setText("Diskon: -Rp " + String.format("%.0f", discount));
-		} else {
-			discountLabel.setText("Diskon: Rp 0");
-		}
-		totalLabel.setText("Total Belanja: Rp " + String.format("%.0f", total));
+		if (discount > 0) discountLabel.setText("Diskon: -Rp " + String.format("%.0f", discount));
+		else discountLabel.setText("Diskon: Rp 0");
+		totalLabel.setText("Total Belanja: Rp " + String.format("%.0f", totalAfterDiscount));
+		if (balance < totalAfterDiscount) totalLabel.setTextFill(Color.RED); else totalLabel.setTextFill(Color.GREEN);
 
-		if (balance < total) {
-			totalLabel.setTextFill(Color.RED);
+		// Enable checkout only when there is a total and balance covers it
+		if (checkoutBtn != null) {
+			checkoutBtn.setDisable(totalAfterDiscount <= 0 || balance < totalAfterDiscount);
+		}
+	}
+
+	// Open edit view for cart item
+	private void openEdit(CartItem item) {
+		if (navigationListener != null) {
+			navigationListener.navigateTo("CART_DETAIL", item.getIdCartItem(), item.getIdProduct());
 		} else {
-			totalLabel.setTextFill(Color.GREEN);
+			showAlert("Error", "Navigation listener not set. Cannot open detail.");
 		}
 	}
 
 	// Handle checkout process
 	private void checkout() {
-	    if (currentProduct == null || currentItem == null) {
-	        showAlert("Warning", "Keranjang belanja kosong!");
-	        return;
-	    }
+		// ensure there are items
+		if (table.getItems() == null || table.getItems().isEmpty()) {
+			showAlert("Warning", "Keranjang belanja kosong!");
+			return;
+		}
 
-	    int qty;
-	    try {
-	        qty = Integer.parseInt(qtyField.getText());
-	        if (qty <= 0) {
-	            showAlert("Warning", "Quantity harus lebih besar dari 0.");
-	            return;
-	        }
-	    } catch (NumberFormatException ex) {
-	        showAlert("Warning", "Masukkan angka valid untuk quantity.");
-	        return;
-	    }
+		// compute totals
+		double totalBefore = 0;
+		for (CartItem ci : table.getItems()) {
+			Product p = pc.getProduct(ci.getIdProduct());
+			if (p != null) totalBefore += p.getPrice() * ci.getCount();
+		}
+		if (totalBefore <= 0) {
+			showAlert("Warning", "Total belanja tidak valid.");
+			return;
+		}
 
-	    double balance = cc.getBalance(customerId);
-	    double total = currentProduct.getPrice() * qty;
-	    double discount = 0;
-	    String idPromo = null;
+		// apply promo if any
+		Promo selectedPromo = promoCombo.getSelectionModel().getSelectedItem();
+		double discount = 0;
+		String promoId = null;
+		if (selectedPromo != null) {
+			promoId = selectedPromo.getIdPromo(); // use promo id for header
+			discount = totalBefore * (selectedPromo.getDiscountPercentage() / 100.0);
+		}
 
-	    Promo selectedPromo = promoCombo.getSelectionModel().getSelectedItem();
-	    if (selectedPromo != null) {
-	        idPromo = selectedPromo.getIdPromo();
-	        discount = total * (selectedPromo.getDiscountPercentage() / 100.0);
-	        total = total - discount;
-	    }
+		// check balance
+		double totalAfterDiscount = totalBefore - discount;
+		double balance = cc.getBalance(customerId);
+		if (balance < totalAfterDiscount) {
+			showAlert("Error", "Saldo tidak mencukupi! Silakan top-up terlebih dahulu.");
+			return;
+		}
 
-	    // Normalize empty promo to null and log debug info
-	    if (idPromo != null && idPromo.trim().isEmpty()) {
-	        idPromo = null;
-	    }
+		// create order header first
+		OrderHandler oc = new OrderHandler();
+		String orderId = oc.saveDataOrderHeader(customerId, promoId, totalAfterDiscount);
+		if (orderId == null || orderId.trim().isEmpty()) {
+			showAlert("Error", "Gagal menyimpan order header: " + orderId);
+			return;
+		}
 
-	    if (balance < total) {
-	        showAlert("Error", "Saldo tidak mencukupi! Silakan top-up terlebih dahulu.");
-	        return;
-	    }
+		// add each cart item as order detail
+		int idx = 0;
+		for (CartItem ci : table.getItems()) {
+			idx++;
+			Product p = pc.getProduct(ci.getIdProduct());
+			if (p == null) {
+				showAlert("Error", "Produk tidak ditemukan untuk item cart.");
+				return;
+			}
+			String productIdStr = String.valueOf(ci.getIdProduct());
+			String detailRes = oc.saveOrderDetail(orderId, productIdStr, ci.getCount());
+			if (!"success".equals(detailRes)) {
+				showAlert("Error", "Gagal menyimpan detail order untuk produk " + productIdStr + ": " + detailRes);
+				return;
+			}
 
-	    String orderId = "ORD_" + System.currentTimeMillis();
-		String orderDetailId = "ORDDET_" + System.currentTimeMillis() + "_" + currentItem.getIdProduct();
-		String codePromo = selectedPromo != null ? selectedPromo.getCode() : null;
-		String result = oc.checkout(orderId, orderDetailId, customerId, currentItem.getIdProduct(), codePromo, total, qty);
+			// update product stock
+			String stockRes = pc.editProductStock(productIdStr, p.getStock() - ci.getCount());
+			if (!"success".equals(stockRes)) {
+				showAlert("Error", "Gagal mengupdate stok untuk produk " + productIdStr + ": " + stockRes);
+				return;
+			}
+		}
 
-	    if ("success".equals(result)) {
-	        showAlert("Success", "Checkout berhasil! Order ID: " + orderId);
-	        cic.deleteCartItem(customerId, currentItem.getIdProduct());
-	        clearDisplayedItem();
-	        promoCombo.getSelectionModel().clearSelection();
-	        updateTotalAndBalance();
-	    } else {
-	        showAlert("Error", "Checkout gagal: " + result);
-	    }
+		// on success remove all items from cart and refresh
+		for (CartItem ci : table.getItems()) {
+			cic.deleteCartItem(customerId, ci.getIdProduct());
+		}
+		loadCartItems();
+		// reset promo to none
+		if (promoCombo != null && !promoCombo.getItems().isEmpty()) {
+			promoCombo.getSelectionModel().selectFirst();
+		} else if (promoCombo != null) {
+			promoCombo.getSelectionModel().clearSelection();
+		}
+		updateTotals();
+
+		showAlert("Success", "Checkout berhasil! Order ID: " + orderId);
+		if (onUpdated != null) onUpdated.run();
+		if (navigationListener != null) navigationListener.goBack();
 	}
 
 	// Show alert dialog
@@ -421,37 +416,17 @@ public class CartView {
 		alert.showAndWait();
 	}
 
-	// Getter dan Setters
+	// Getters dan Setters
 	public Scene getScene() {
 		return scene;
 	}
 
-	public void setNavigationListener(NavigationListener listener) {
-		this.navigationListener = listener;
+	public void setOnUpdated(Runnable onUpdated) {
+		this.onUpdated = onUpdated;
 	}
 
-	// Inisialisasi komponen UI
-	private void init() {
-		mainLayout = new BorderPane();
-		gridLayout = new GridPane();
-
-		totalLabel = new Label();
-		balanceLabel = new Label();
-		discountLabel = new Label();
-		promoCombo = new ComboBox<>();
-
-		// initialize buttons as fields so they can be accessed from other methods/tests
-		checkoutBtn = new Button("Checkout");
-		backBtn = new Button("Kembali");
-		updateBtn = new Button("Update");
-
-		// inline delete next to update
-		deleteBtn = new Button("Hapus");
-
-		// product display components
-		productNameLabel = new Label("Keranjang kosong");
-		priceLabel = new Label();
-		subtotalLabel = new Label();
-		qtyField = new TextField();
+	// Set navigation listener
+	public void setNavigationListener(NavigationListener navigationListener) {
+		this.navigationListener = navigationListener;
 	}
 }
