@@ -151,17 +151,8 @@ public class CartItemDetailView {
 	 * Returns true when item was found and UI populated.
 	 */
 	public boolean loadForProduct(String productId) {
-		this.currentItem = null;
 		try {
-			List<CartItem> items = cic.getCartItems(cartId);
-			if (items != null) {
-				for (CartItem ci : items) {
-					if (productId != null && productId.equals(String.valueOf(ci.getIdProduct()))) {
-						this.currentItem = ci;
-						break;
-					}
-				}
-			}
+			currentItem = cic.getCartItemById(cartId);
 		} catch (Exception ex) {
 			this.currentItem = null;
 		}

@@ -114,7 +114,6 @@ public class OrderHandler {
         String status = "pending";
         LocalDateTime orderDate = LocalDateTime.now();
 
-        System.out.println("idOrder: " + idOrder + ", idCustomer: " + idCustomer + ", idPromo: " + idPromo + ", status: " + status + ", orderDate: " + orderDate + ", totalAmount: " + totalAmount);
         OrderHeader orderHeader = new OrderHeader(idOrder, idCustomer, idPromo, status, orderDate, totalAmount);
         if (orderHeaderDAO.saveDataOrderHeader(orderHeader)) {
             return idOrder;
@@ -138,7 +137,6 @@ public class OrderHandler {
 
         String idOrderDetail = orderDetailDAO.generateId();
 
-        System.out.println("idOrderDetail: " + idOrderDetail + ", idOrder: " + idOrder + ", idProduct: " + idProduct + ", qty: " + qty);
         OrderDetail orderDetail = new OrderDetail(idOrderDetail, idOrder, idProduct, qty);
         if (orderDetailDAO.insertOrderDetail(orderDetail)) {
             return "success";

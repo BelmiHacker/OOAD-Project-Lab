@@ -22,7 +22,11 @@ import model.Promo;
 
 import java.util.List;
 
+/**
+ * CartView - JavaFX view untuk menampilkan dan mengelola keranjang belanja customer
+ */
 public class CartView {
+	// UI
 	private Scene scene;
 	private BorderPane mainLayout;
 
@@ -44,8 +48,9 @@ public class CartView {
 	private Label balanceLabel;
 	private Label discountLabel;
 	private Button checkoutBtn;
-	private ComboBox<Promo> promoCombo; // added promo dropdown
+	private ComboBox<Promo> promoCombo;
 
+	// Constructor
 	public CartView(String customerId) {
 		this.customerId = customerId;
 		init();
@@ -54,10 +59,7 @@ public class CartView {
 		scene = new Scene(mainLayout, 900, 600);
 	}
 
-	public void setNavigationListener(NavigationListener navigationListener) {
-		this.navigationListener = navigationListener;
-	}
-
+	// Initialize UI components
 	private void init() {
 		mainLayout = new BorderPane();
 
@@ -66,13 +68,14 @@ public class CartView {
 		balanceLabel = new Label();
 		discountLabel = new Label();
 		checkoutBtn = new Button("Checkout");
-		promoCombo = new ComboBox<>(); // init promo combo
+		promoCombo = new ComboBox<>();
 	}
 
+	// Setup layout and styling
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 
-		// Header with Back button
+		// Header
 		HBox header = new HBox(12);
 		header.setStyle("-fx-background-color: #c8dcfa; -fx-padding: 15;");
 		header.setAlignment(Pos.CENTER_LEFT);
@@ -113,6 +116,7 @@ public class CartView {
 		});
 		subtotalCol.setPrefWidth(160);
 
+		// Action column with Edit and Delete buttons
 		TableColumn<CartItem, Void> actionCol = new TableColumn<>("Aksi");
 		actionCol.setPrefWidth(160);
 		actionCol.setCellFactory(col -> new TableCell<>() {
@@ -160,7 +164,7 @@ public class CartView {
 		discountLabel.setTextFill(Color.web("#FF9800"));
 		totalsBox.getChildren().addAll(balanceLabel, discountLabel, totalLabel);
 
-		// Style checkout button (yellow background)
+		// Buttons
 		checkoutBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #FFEB3B; -fx-text-fill: black;");
 
 		checkoutBtn.setOnAction(e -> {
@@ -191,7 +195,7 @@ public class CartView {
 		promoCombo.setPrefWidth(220);
 		promoBox.getChildren().addAll(promoLbl, promoCombo);
 
-		// Load promos into combo and add a null entry as "None"
+		// Load promos into combo
 		List<Promo> promos = promoC.getAllPromos();
 		if (promos != null) {
 			ObservableList<Promo> promoList = FXCollections.observableArrayList();
@@ -264,6 +268,7 @@ public class CartView {
 		mainLayout.setBottom(bottom);
 	}
 
+	// Load cart items from DB
 	private void loadCartItems() {
 		try {
 			List<CartItem> items = cic.getCartItems(customerId);
@@ -276,6 +281,7 @@ public class CartView {
 		updateTotals();
 	}
 
+	// Update totals display
 	private void updateTotals() {
 		double balance = cc.getBalance(customerId);
 		double total = 0;
@@ -285,6 +291,7 @@ public class CartView {
 			if (p != null) total += p.getPrice() * ci.getCount();
 		}
 
+		// apply promo discount if any
 		Promo selectedPromo = promoCombo.getSelectionModel().getSelectedItem();
 		if (selectedPromo != null) {
 			double pct = selectedPromo.getDiscountPercentage();
@@ -293,6 +300,7 @@ public class CartView {
 
 		double totalAfterDiscount = total - discount;
 
+		// update labels
 		balanceLabel.setText("Saldo Anda: Rp " + String.format("%.0f", balance));
 		if (discount > 0) discountLabel.setText("Diskon: -Rp " + String.format("%.0f", discount));
 		else discountLabel.setText("Diskon: Rp 0");
@@ -305,6 +313,7 @@ public class CartView {
 		}
 	}
 
+	// Open edit view for cart item
 	private void openEdit(CartItem item) {
 		if (navigationListener != null) {
 			navigationListener.navigateTo("CART_DETAIL", item.getIdCartItem(), item.getIdProduct());
@@ -313,6 +322,7 @@ public class CartView {
 		}
 	}
 
+	// Handle checkout process
 	private void checkout() {
 		// ensure there are items
 		if (table.getItems() == null || table.getItems().isEmpty()) {
@@ -331,6 +341,7 @@ public class CartView {
 			return;
 		}
 
+		// apply promo if any
 		Promo selectedPromo = promoCombo.getSelectionModel().getSelectedItem();
 		double discount = 0;
 		String promoId = null;
@@ -339,6 +350,7 @@ public class CartView {
 			discount = totalBefore * (selectedPromo.getDiscountPercentage() / 100.0);
 		}
 
+		// check balance
 		double totalAfterDiscount = totalBefore - discount;
 		double balance = cc.getBalance(customerId);
 		if (balance < totalAfterDiscount) {
@@ -396,6 +408,7 @@ public class CartView {
 		if (navigationListener != null) navigationListener.goBack();
 	}
 
+	// Show alert dialog
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
@@ -403,11 +416,17 @@ public class CartView {
 		alert.showAndWait();
 	}
 
+	// Getters dan Setters
 	public Scene getScene() {
 		return scene;
 	}
 
 	public void setOnUpdated(Runnable onUpdated) {
 		this.onUpdated = onUpdated;
+	}
+
+	// Set navigation listener
+	public void setNavigationListener(NavigationListener navigationListener) {
+		this.navigationListener = navigationListener;
 	}
 }
