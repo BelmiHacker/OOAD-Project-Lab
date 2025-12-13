@@ -4,6 +4,8 @@ import model.CartItem;
 import database.CartItemDAO;
 import database.ProductDAO;
 
+import java.util.List;
+
 /**
  * CartItemController
  * 
@@ -41,26 +43,6 @@ public class CartItemHandler {
         // check if product's stock is sufficient
         if (productDAO.getStock(idProduct) <= 0) {
             return "Stok produk habis, tidak dapat menambahkan ke cart";
-        }
-
-        // Check existing cart item for this customer (single-item cart)
-        CartItem existing = getCartItems(idCustomer);
-        if (existing != null) {
-            if (!existing.getIdProduct().equals(idProduct)) {
-                // Different product already in cart -> instruct user to remove it first
-                return "Keranjang berisi produk lain. Hapus item di cart terlebih dahulu untuk menambahkan produk lain.";
-            } else {
-                // Same product: merge counts (with stock validation) and update
-                int availableStock = productDAO.getStock(idProduct);
-                int newCount = existing.getCount() + count;
-                if (newCount > availableStock) {
-                    return "Jumlah melebihi stok yang tersedia";
-                }
-                if (cartItemDAO.updateCount(idCustomer, idProduct, newCount)) {
-                    return "success";
-                }
-                return "Tambah ke cart gagal";
-            }
         }
 
     // No existing item -> normal insert flow
@@ -116,7 +98,7 @@ public class CartItemHandler {
      * @param idCustomer ID customer
      * @return CartItem object jika ditemukan, null sebaliknya
      */
-    public CartItem getCartItems(String idCustomer) {
+    public List<CartItem> getCartItems(String idCustomer) {
         return cartItemDAO.getCartItemByCustomerId(idCustomer);
     }
 

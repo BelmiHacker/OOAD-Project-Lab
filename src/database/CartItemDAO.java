@@ -100,23 +100,24 @@ public class CartItemDAO {
      * @param idCustomer ID dari Customer yang dicari
      * @return CartItem object jika ditemukan, null jika tidak ditemukan
      */
-    public CartItem getCartItemByCustomerId(String idCustomer) {
+    public List<CartItem> getCartItemByCustomerId(String idCustomer) {
         String sql = "SELECT * FROM CartItem WHERE idCustomer = ?";
+        List<CartItem> cartItems = new ArrayList<>();
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, idCustomer);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return new CartItem(
+            while (rs.next()) {
+                cartItems.add(new CartItem(
                         rs.getString("idCartItem"),
                         rs.getString("idCustomer"),
                         rs.getString("idProduct"),
                         rs.getInt("count")
-                );
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return cartItems;
     }
 
     /**

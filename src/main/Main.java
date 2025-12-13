@@ -118,6 +118,18 @@ public class Main extends Application implements NavigationListener {
                         primaryStage.setHeight(700);
                     }
                     break;
+
+                case "CART_DETAIL":
+                    if (params.length > 1) {
+                        String cartItemId = params[0];
+                        currentCustomerId = params[1];
+                        CartItemDetailView cartItemDetailView = new CartItemDetailView(currentCustomerId, currentProductId);
+                        cartItemDetailView.setNavigationListener(this);
+                        primaryStage.setScene(cartItemDetailView.getScene());
+                        primaryStage.setWidth(600);
+                        primaryStage.setHeight(450);
+                    }
+                    break;
                     
                 case "COURIER_LIST":
                     if (params.length > 0) {
@@ -223,6 +235,8 @@ public class Main extends Application implements NavigationListener {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
         } else if ("CART".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
+        } else if ("CART_DETAIL".equals(currentView)) {
+            navigateTo("CART", currentCustomerId);
         } else if ("TOPUP".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
         } else if ("COURIER_DETAIL".equals(currentView)) {
