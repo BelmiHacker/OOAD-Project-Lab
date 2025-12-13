@@ -132,6 +132,15 @@ public class CustomerProductListView {
 			}
 		});
 		
+		
+		Button orderHistoryBtn = new Button("View Order History");
+		orderHistoryBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #eb2394; -fx-text-fill: white;");
+		orderHistoryBtn.setOnAction(e -> {
+			if (navigationListener != null) {
+				navigationListener.navigateTo("ORDER_HISTORY", userId);
+			}
+		});
+		
 		Button logoutBtn = new Button("Logout");
 		logoutBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #999999; -fx-text-fill: white;");
 		logoutBtn.setOnAction(e -> {
@@ -140,7 +149,8 @@ public class CustomerProductListView {
 			}
 		});
 		
-		buttonPanel.getChildren().addAll(detailBtn, cartBtn, topUpBtn, editProfileBtn, logoutBtn);
+		
+		buttonPanel.getChildren().addAll(detailBtn, cartBtn, topUpBtn, editProfileBtn, orderHistoryBtn, logoutBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
 

@@ -199,6 +199,12 @@ public class Main extends Application implements NavigationListener {
                         primaryStage.setHeight(700);
                     }
                     break;
+                
+                case "ORDER_HISTORY":
+                	CustomerOrderHistory customerOrderHistory = new CustomerOrderHistory();
+                	customerOrderHistory.setNavigationListener(this);
+                	// TODO ??????
+                	break;
             }
         } catch (Exception e) {
             e.printStackTrace();
