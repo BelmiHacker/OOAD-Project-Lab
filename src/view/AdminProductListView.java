@@ -135,7 +135,7 @@ public class AdminProductListView {
 		});
 
 
-
+		// button logout
 		Button logoutBtn = new Button("Logout");
 		logoutBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color:  #999999; -fx-text-fill: white;");
 		logoutBtn.setOnAction(e -> {
@@ -258,6 +258,9 @@ public class AdminProductListView {
 		return scene;
 	}
 
+	/**
+	 * Menyambungkan NavigationListener dari Main.
+	 */
 	public void setNavigationListener(NavigationListener listener) {
 		this.navigationListener = listener;
 	}

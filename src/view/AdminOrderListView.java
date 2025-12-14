@@ -26,9 +26,15 @@ import model.Courier;
 import java.util.List;
 
 /**
- * AdminOrderListView - JavaFX view untuk admin mengelola orders dan assign courier
- * View ini menampilkan tabel order, fitur assign courier, serta navigasi ke detail order.
+ * AdminOrderListView
+ * ------------------
+ * View untuk admin dalam mengelola data order.
+ * Fitur utama:
+ * 1. Menampilkan daftar order dalam TableView
+ * 2. Melakukan assign courier ke order
+ * 3. Navigasi ke halaman detail order
  */
+
 public class AdminOrderListView {
 	
 	// Scene utama untuk view ini (dipakai oleh Main untuk setScene)
@@ -97,11 +103,16 @@ public class AdminOrderListView {
 	    courierCombo.setPrefWidth(250);
 
 	 // Ambil semua courier lalu isi ke ComboBox
-	    List<Courier> couriers = cc.getAllCouriers();
-	    if (couriers != null) {
-	        ObservableList<Courier> courierList = FXCollections.observableArrayList(couriers);
-	        courierCombo.setItems(courierList);
+	    List<String> courierIds = cc.getAllCourierIds();
+	    ObservableList<Courier> courierList = FXCollections.observableArrayList();
 
+	    if (courierIds != null) {
+	        for (String id : courierIds) {
+	            Courier c = cc.getCourierById(id);
+	            if (c != null) courierList.add(c);
+	        }
+	    }
+	    courierCombo.setItems(courierList);
 		     // Custom tampilan item di dropdown
 	        courierCombo.setCellFactory(col -> new javafx.scene.control.ListCell<Courier>() {
 	            @Override
@@ -119,7 +130,7 @@ public class AdminOrderListView {
 	                setText(empty ? null : courier.getIdCourier() + " - " + courier.getVehicleType());
 	            }
 	        });
-	    }
+	    
 
 	 // Tombol untuk assign courier ke order yang dipilih
 	    Button assignBtn = new Button("Assign Courier");
@@ -249,11 +260,18 @@ public class AdminOrderListView {
 	
 	// Mengambil semua order dari OrderHandler lalu menampilkan ke TableView
 	private void loadOrders() {
-		List<OrderHeader> orders = oc.getAllOrders();
-		if (orders != null) {
-			ObservableList<OrderHeader> items = FXCollections.observableArrayList(orders);
-			orderTable.setItems(items);
-		}
+	    List<String> orderIds = oc.getAllOrderIds(); // method yang kamu sudah punya
+
+	    ObservableList<OrderHeader> items = FXCollections.observableArrayList();
+
+	    if (orderIds != null) {
+	        for (String idOrder : orderIds) {
+	            OrderHeader oh = oc.getOrderHeader(idOrder); // method yang kamu sudah tambah
+	            if (oh != null) items.add(oh);
+	        }
+	    }
+
+	    orderTable.setItems(items);
 	}
 	
 	// Helper untuk menampilkan alert informasi (warning/sukses/error)

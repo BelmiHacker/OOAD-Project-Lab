@@ -173,6 +173,17 @@ public class OrderHandler {
     public List<OrderHeader> getAllOrders() {
         return orderHeaderDAO.getAllOrderHeaders();
     }
+    
+    /**
+     * Mengambil OrderHeader berdasarkan idOrder.
+     * Biasanya dipakai admin untuk membuka detail order.
+     *
+     * @param idOrder ID order
+     * @return OrderHeader jika ditemukan, null jika tidak ditemukan
+     */
+    public OrderHeader getOrderHeader(String idOrder) {
+        return orderHeaderDAO.getOrderHeaderById(idOrder);
+    }
 
     /**
      * Mendapatkan detail items dari order
@@ -182,6 +193,16 @@ public class OrderHandler {
      */
     public List<OrderDetail> getOrderDetails(String idOrder) {
         return orderDetailDAO.getOrderDetailsByOrderId(idOrder);
+    }
+    
+    /**
+     * Mengambil seluruh idOrder dari database.
+     * Biasanya digunakan untuk mapping atau load data secara bertahap.
+     *
+     * @return List idOrder
+     */
+    public List<String> getAllOrderIds() {
+        return orderHeaderDAO.getAllOrderIds();
     }
 
     /**

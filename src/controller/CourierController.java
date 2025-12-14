@@ -1,6 +1,9 @@
 package controller;
 
 import model.Courier;
+
+import java.util.List;
+
 import database.CourierDAO;
 
 /**
@@ -63,6 +66,27 @@ public class CourierController {
         return "Tambah kurir gagal";
     }
 
+    /**
+     * Mengambil seluruh ID Courier dari database.
+     * Method ini biasanya digunakan untuk proses mapping
+     * atau load data secara bertahap.
+     *
+     * @return List berisi idCourier
+     */
+    public List<String> getAllCourierIds() {
+        return courierDAO.getAllCourierIds();
+    }
+
+    /**
+     * Mengambil data Courier berdasarkan ID Courier.
+     * yang digunakan dalam dokumentasi sistem.
+     *
+     * @param idCourier ID courier
+     * @return objek Courier jika ditemukan, null jika tidak ditemukan
+     */
+    public Courier getCourier(String idCourier) {
+        return courierDAO.getCourierById(idCourier);
+    }
     /**
      * Update data kurir
      * 
