@@ -171,7 +171,7 @@ public class Main extends Application implements NavigationListener {
                     adminOrderView.setNavigationListener(this);
                     primaryStage.setScene(adminOrderView.getScene());
                     primaryStage.setWidth(1100);
-                    primaryStage.setHeight(800);
+                    primaryStage.setHeight(720);
                     break;
                     
                 case "ADMIN_ORDER_DETAIL":

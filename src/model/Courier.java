@@ -6,7 +6,7 @@ package model;
  * Merepresentasikan entitas Kurir dalam sistem JoymarKet.
  * Menyimpan informasi kurir termasuk kendaraan dan plat nomor.
  */
-public class Courier {
+public class Courier extends User{
     private String idCourier;      // ID unik kurir
     private String vehicleType;    // Tipe kendaraan (Motor/Mobil)
     private String vehiclePlate;   // Plat nomor kendaraan

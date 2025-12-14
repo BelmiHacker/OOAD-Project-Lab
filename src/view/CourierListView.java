@@ -19,6 +19,8 @@ import javafx.geometry.Pos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Delivery;
+
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -120,6 +122,19 @@ import java.util.List;
 	        }
 
 	        buttonPanel.getChildren().addAll(detailBtn, updateBtn);
+	        
+	        // Biar courier bisa logout juga dari app
+	        if(courierId != null) {
+	        	Button backBtn = new Button("Logout");
+	            backBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #6c757d; -fx-text-fill: white;");
+	            backBtn.setOnAction(e -> {
+	                if (navigationListener != null) {
+	                    navigationListener.navigateTo("LOGIN");
+	                }
+	            });
+	            buttonPanel.getChildren().add(backBtn);
+	        }
+	        
 	        mainLayout.setBottom(buttonPanel);
 	    }
 
@@ -164,11 +179,11 @@ import java.util.List;
 	    List<Delivery> deliveries;
 
 	    if (courierId == null || courierId.isEmpty()) {
-	        deliveries = dc.getAllDeliveries(); 
+	        deliveries = dc.getAllDeliveries();
 	    } else {
 	        deliveries = dc.getDeliveriesByCourierId(courierId);
 	    }
-
+	    
 	    if (deliveries != null) {
 	        ObservableList<Delivery> items = FXCollections.observableArrayList(deliveries);
 	        deliveryTable.setItems(items);
