@@ -8,7 +8,6 @@ package model;
  */
 public class Courier {
     private String idCourier;      // ID unik kurir
-    private String idUser;         // ID user yang terkait dengan kurir
     private String vehicleType;    // Tipe kendaraan (Motor/Mobil)
     private String vehiclePlate;   // Plat nomor kendaraan
 
@@ -20,7 +19,6 @@ public class Courier {
 
     public Courier(String idCourier, String idUser, String vehicleType, String vehiclePlate) {
         this.idCourier = idCourier;
-        this.idUser = idUser;
         this.vehicleType = vehicleType;
         this.vehiclePlate = vehiclePlate;
     }
@@ -31,14 +29,6 @@ public class Courier {
 
     public void setIdCourier(String idCourier) {
         this.idCourier = idCourier;
-    }
-
-    public String getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(String idUser) {
-        this.idUser = idUser;
     }
 
     public String getVehicleType() {

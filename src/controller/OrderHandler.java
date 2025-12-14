@@ -6,7 +6,6 @@ import database.OrderHeaderDAO;
 import database.OrderDetailDAO;
 import database.CartItemDAO;
 import database.CustomerDAO;
-import database.PromoDAO;
 import model.Product;
 
 import java.time.LocalDateTime;
@@ -83,7 +82,7 @@ public class OrderHandler {
         OrderHeader orderHeader = new OrderHeader(idOrder, idCustomer, idPromo, "pending",
                                                    LocalDateTime.now(), totalAmount);
 
-        if (!orderHeaderDAO.insertOrderHeader(orderHeader)) {
+        if (!orderHeaderDAO.saveDataOrderHeader(orderHeader)) {
             return "Checkout gagal";
         }
 
@@ -103,19 +102,40 @@ public class OrderHandler {
     }
 
     /**
+     * Simpan data order header baru
+     *
+     * @param idCustomer ID customer yang membuat order
+     * @param idPromo ID promo yang digunakan (boleh null)
+     * @param totalAmount Total amount dari order
+     * @return "success" jika berhasil, pesan error sebaliknya
+     */
+    public String saveDataOrderHeader(String idCustomer, String idPromo, double totalAmount) {
+        String idOrder = orderHeaderDAO.generateId();
+        String status = "pending";
+        LocalDateTime orderDate = LocalDateTime.now();
+
+        OrderHeader orderHeader = new OrderHeader(idOrder, idCustomer, idPromo, status, orderDate, totalAmount);
+        if (orderHeaderDAO.saveDataOrderHeader(orderHeader)) {
+            return idOrder;
+        }
+        return null;
+    }
+
+    /**
      * Tambahkan detail item ke order
      * Validasi memastikan quantity lebih dari 0
      * 
-     * @param idOrderDetail ID order detail yang unik
      * @param idOrder ID order
      * @param idProduct ID produk yang dipesan
      * @param qty Jumlah produk yang dipesan
      * @return "success" jika berhasil, pesan error sebaliknya
      */
-    public String addOrderDetail(String idOrderDetail, String idOrder, String idProduct, int qty) {
+    public String saveOrderDetail(String idOrder, String idProduct, int qty) {
         if (qty <= 0) {
             return "Qty harus lebih dari 0";
         }
+
+        String idOrderDetail = orderDetailDAO.generateId();
 
         OrderDetail orderDetail = new OrderDetail(idOrderDetail, idOrder, idProduct, qty);
         if (orderDetailDAO.insertOrderDetail(orderDetail)) {
