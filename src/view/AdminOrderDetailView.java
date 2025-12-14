@@ -23,6 +23,13 @@ import model.OrderHeader;
 
 import java.util.List;
 
+/**
+ * AdminOrderDetailView
+ * View ini digunakan untuk menampilkan detail dari satu order tertentu.
+ * Informasi yang ditampilkan meliputi header order (ID Order, ID Produk, Quantity, status)
+ * dan tabel detail item order.
+ */
+
 public class AdminOrderDetailView {
 
     private Scene scene;
@@ -96,7 +103,7 @@ public class AdminOrderDetailView {
         mainLayout.setCenter(detailTable);
 
         // ==== TOMBOL BAWAH ====
-        HBox bottomBox = new HBox(10);
+        VBox bottomBox = new VBox(10);
         bottomBox.setPadding(new Insets(15));
         bottomBox.setAlignment(Pos.CENTER_RIGHT);
         bottomBox.setStyle("-fx-background-color: #f0f0f0;");
