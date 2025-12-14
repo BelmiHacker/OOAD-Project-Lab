@@ -21,6 +21,7 @@ public class Main extends Application implements NavigationListener {
     private String currentCustomerId = "CUST_00001";  // Will be set by login
     private String currentCourierId = null;  // Will be set by login
     private String currentProductId = null;
+    private String currentCartId = null;
 
     /**
      * Memulai aplikasi dan menampilkan jendela utama
@@ -118,6 +119,18 @@ public class Main extends Application implements NavigationListener {
                         primaryStage.setHeight(700);
                     }
                     break;
+
+                case "CART_DETAIL":
+                    if (params.length > 1) {
+                        currentCartId = params[0];
+                        String currentCartProductId = params[1];
+                        CartItemDetailView cartItemDetailView = new CartItemDetailView(currentCartId, currentCartProductId);
+                        cartItemDetailView.setNavigationListener(this);
+                        primaryStage.setScene(cartItemDetailView.getScene());
+                        primaryStage.setWidth(600);
+                        primaryStage.setHeight(700);
+                    }
+                    break;
                     
                 case "COURIER_LIST":
                     if (params.length > 0) {
@@ -158,7 +171,7 @@ public class Main extends Application implements NavigationListener {
                     adminOrderView.setNavigationListener(this);
                     primaryStage.setScene(adminOrderView.getScene());
                     primaryStage.setWidth(1100);
-                    primaryStage.setHeight(700);
+                    primaryStage.setHeight(800);
                     break;
                     
                 case "ADMIN_ORDER_DETAIL":
@@ -223,6 +236,8 @@ public class Main extends Application implements NavigationListener {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
         } else if ("CART".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
+        } else if ("CART_DETAIL".equals(currentView)) {
+            navigateTo("CART", currentCustomerId);
         } else if ("TOPUP".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
         } else if ("COURIER_DETAIL".equals(currentView)) {

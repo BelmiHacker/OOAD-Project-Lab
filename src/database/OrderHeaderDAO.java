@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class OrderHeaderDAO {
      * @param orderHeader OrderHeader object yang akan disimpan
      * @return boolean true jika berhasil, false jika gagal
      */
-    public boolean insertOrderHeader(OrderHeader orderHeader) {
+    public boolean saveDataOrderHeader(OrderHeader orderHeader) {
         String sqlInsert = "INSERT INTO OrderHeader (idOrder, idCustomer, idPromo, status, orderedAt, totalAmount) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sqlInsert)) {
             ps.setString(1, orderHeader.getIdOrder());
