@@ -48,56 +48,124 @@ public class AdminOrderListView {
 		scene = new Scene(mainLayout, 1100, 700);
 	}
 	
-	private void init() {
-		mainLayout = new BorderPane();
-		orderTable = new TableView<>();
-	}
-	
 	private void setupLayout() {
 	    mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 
-	    VBox header = new VBox(5);
+	    VBox header = new VBox();
 	    header.setStyle("-fx-background-color: #c8dcfa; -fx-padding: 15;");
 	    header.setAlignment(Pos.CENTER_LEFT);
 
 	    Label title = new Label("Kelola Order & Assign Courier");
-	    title.setFont(Font.font("Arial", FontWeight.BOLD, 22));
+	    title.setFont(Font.font("Arial", FontWeight.BOLD, 24));
 	    title.setTextFill(Color.web("#333333"));
 
 	    header.getChildren().add(title);
-	    mainLayout.setTop(header);	    
-	    
-	    /* BAGIAN BARU */
+	    mainLayout.setTop(header);
+
 	    // Table
 	    setupTable();
 	    mainLayout.setCenter(orderTable);
-	    
-	    // Button Panel
+
+	    // Panel assign courier (atas tombol)
+	    VBox assignPanel = new VBox(10);
+	    assignPanel.setPadding(new Insets(15));
+	    assignPanel.setStyle("-fx-background-color: #f0f0f0;");
+
+	    HBox courierPanel = new HBox(10);
+	    courierPanel.setAlignment(Pos.CENTER_LEFT);
+
+	    Label courierLabel = new Label("Pilih Courier:");
+	    courierLabel.setFont(Font.font("Arial", 12));
+
+	    ComboBox<Courier> courierCombo = new ComboBox<>();
+	    courierCombo.setPrefWidth(250);
+
+	    List<Courier> couriers = cc.getAllCouriers();
+	    if (couriers != null) {
+	        ObservableList<Courier> courierList = FXCollections.observableArrayList(couriers);
+	        courierCombo.setItems(courierList);
+	        courierCombo.setCellFactory(col -> new javafx.scene.control.ListCell<Courier>() {
+	            @Override
+	            protected void updateItem(Courier courier, boolean empty) {
+	                super.updateItem(courier, empty);
+	                setText(empty ? null : courier.getIdCourier() + " - " + courier.getVehicleType());
+	            }
+	        });
+	        courierCombo.setButtonCell(new javafx.scene.control.ListCell<Courier>() {
+	            @Override
+	            protected void updateItem(Courier courier, boolean empty) {
+	                super.updateItem(courier, empty);
+	                setText(empty ? null : courier.getIdCourier() + " - " + courier.getVehicleType());
+	            }
+	        });
+	    }
+
+	    Button assignBtn = new Button("Assign Courier");
+	    assignBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #4CAF50; -fx-text-fill: white;");
+	    assignBtn.setOnAction(e -> {
+	        OrderHeader selected = orderTable.getSelectionModel().getSelectedItem();
+	        Courier selectedCourier = courierCombo.getSelectionModel().getSelectedItem();
+
+	        if (selected == null) {
+	            showAlert("Warning", "Pilih order terlebih dahulu!");
+	            return;
+	        }
+
+	        if (selectedCourier == null) {
+	            showAlert("Warning", "Pilih courier terlebih dahulu!");
+	            return;
+	        }
+
+	        String deliveryId = "DEL_" + System.currentTimeMillis();
+	        String result = dc.assignCourier(deliveryId, selected.getIdOrder(), selectedCourier.getIdCourier());
+
+	        if ("success".equals(result)) {
+	            showAlert("Sukses", "Courier berhasil di-assign ke order!");
+	            loadOrders();
+	            courierCombo.getSelectionModel().clearSelection();
+	        } else {
+	            showAlert("Error", "Gagal assign courier: " + result);
+	        }
+	    });
+
+	    courierPanel.getChildren().addAll(courierLabel, courierCombo, assignBtn);
+	    assignPanel.getChildren().add(courierPanel);
+
+	    // ==== PANEL TOMBOL BAWAH ====
 	    HBox buttonPanel = new HBox(10);
 	    buttonPanel.setPadding(new Insets(15));
-	    buttonPanel.setAlignment(Pos.CENTER_LEFT);
 	    buttonPanel.setStyle("-fx-background-color: #f0f0f0;");
-	   
-	    // Order Detail Button
-	    Button orderDetailBtn = new Button("Order Detail");
-	    orderDetailBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #999999; -fx-text-fill: white;");
-	    orderDetailBtn.setOnAction(e -> {
-	    	if (navigationListener != null) {
-	    		navigationListener.navigateTo("ADMIN_ORDER_DETAIL");
-	    	}
+	    buttonPanel.setAlignment(Pos.CENTER_RIGHT);
+
+	    // 1) Tombol LIHAT DETAIL ORDER
+	    Button detailBtn = new Button("Lihat Detail Order");
+	    detailBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #2196F3; -fx-text-fill: white;");
+	    detailBtn.setOnAction(e -> {
+	        OrderHeader selected = orderTable.getSelectionModel().getSelectedItem();
+	        if (selected == null) {
+	            showAlert("Warning", "Pilih order dulu.");
+	            return;
+	        }
+	        if (navigationListener != null) {
+	            navigationListener.navigateTo("ADMIN_ORDER_DETAIL", selected.getIdOrder());
+	        }
 	    });
-       
-	    // Back Button
+
+
+	    // 2) Tombol KEMBALI
 	    Button backBtn = new Button("Kembali");
 	    backBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #999999; -fx-text-fill: white;");
 	    backBtn.setOnAction(e -> {
-	    	if (navigationListener != null) {
-	    		navigationListener.goBack();
-	    	}
+	        if (navigationListener != null) {
+	            navigationListener.goBack();
+	        }
 	    });
-	    
-	    buttonPanel.getChildren().addAll(orderDetailBtn, backBtn);
-	    mainLayout.setBottom(buttonPanel);
+
+	    buttonPanel.getChildren().addAll(detailBtn, backBtn);
+
+	    VBox bottomBox = new VBox();
+	    bottomBox.getChildren().addAll(assignPanel, buttonPanel);
+	    mainLayout.setBottom(bottomBox);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -166,4 +234,8 @@ public class AdminOrderListView {
 		this.navigationListener = listener;
 	}
 	
+	private void init() {
+		mainLayout = new BorderPane();
+		orderTable = new TableView<>();
+	}
 }

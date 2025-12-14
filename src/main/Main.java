@@ -201,9 +201,12 @@ public class Main extends Application implements NavigationListener {
                     break;
                 
                 case "ORDER_HISTORY":
-                	CustomerOrderHistory customerOrderHistory = new CustomerOrderHistory();
-                	customerOrderHistory.setNavigationListener(this);
+                	CustomerOrderHistoryView customerOrderHistoryView = new CustomerOrderHistoryView();
+                	customerOrderHistoryView.setNavigationListener(this);
                 	// TODO ??????
+                	primaryStage.setScene(customerOrderHistoryView.getScene());
+                    primaryStage.setWidth(900);
+                    primaryStage.setHeight(700);
                 	break;
             }
         } catch (Exception e) {
