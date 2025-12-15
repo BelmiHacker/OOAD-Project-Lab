@@ -43,6 +43,7 @@ public class OrderHeaderDAO {
                     nextId = maxId + 1;
                 }
             }
+            System.out.println(nextId);
             return String.format("ORDER_%05d", nextId);
         } catch (SQLException e) {
             e.printStackTrace();

@@ -135,7 +135,15 @@ public class CustomerProductListView {
 				navigationListener.navigateTo("EDIT_PROFILE", userId);
 			}
 		});
-
+		
+		Button orderHistoryBtn = new Button("Sejarah Belanja");
+		orderHistoryBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #903bd1; -fx-text-fill: white;");
+		orderHistoryBtn.setOnAction(e -> {
+			if (navigationListener != null) {
+				navigationListener.navigateTo("CUSTOMER_ORDER_HISTORY", customerId);
+			}
+		});
+		
 		Button logoutBtn = new Button("Logout");
 		logoutBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #999999; -fx-text-fill: white;");
 		logoutBtn.setOnAction(e -> {
@@ -144,7 +152,7 @@ public class CustomerProductListView {
 			}
 		});
 
-		buttonPanel.getChildren().addAll(detailBtn, cartBtn, topUpBtn, editProfileBtn, logoutBtn);
+		buttonPanel.getChildren().addAll(detailBtn, cartBtn, topUpBtn, orderHistoryBtn, editProfileBtn, logoutBtn);
 		mainLayout.setBottom(buttonPanel);
 	}
 

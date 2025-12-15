@@ -7,7 +7,7 @@ package model;
  * Courier bertugas melakukan pengiriman order dan memiliki informasi terkait
  * identitas user serta kendaraan yang digunakan.
  */
-public class Courier {
+public class Courier extends User{
     private String idCourier;      // ID unik kurir
     private String idUser;			// ID unik user
     private String vehicleType;    // Tipe kendaraan (Motor/Mobil)

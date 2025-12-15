@@ -171,7 +171,7 @@ public class Main extends Application implements NavigationListener {
                     adminOrderView.setNavigationListener(this);
                     primaryStage.setScene(adminOrderView.getScene());
                     primaryStage.setWidth(1100);
-                    primaryStage.setHeight(800);
+                    primaryStage.setHeight(720);
                     break;
                     
                 case "ADMIN_ORDER_DETAIL":
@@ -184,7 +184,18 @@ public class Main extends Application implements NavigationListener {
                         primaryStage.setHeight(600);
                     }
                     break;
-
+                    
+                case "COURIER_ORDER_DETAIL":
+                    if (params.length > 0) {
+                        String orderId = params[0];
+                        AdminOrderDetailView detailView = new AdminOrderDetailView(orderId);
+                        detailView.setNavigationListener(this);
+                        primaryStage.setScene(detailView.getScene());
+                        primaryStage.setWidth(900);
+                        primaryStage.setHeight(600);
+                    }
+                    break;
+                    
                 case "ADMIN_COURIER_LIST":
                     CourierListView adminCourierListView = new CourierListView(null);
                     adminCourierListView.setNavigationListener(this);
@@ -212,6 +223,17 @@ public class Main extends Application implements NavigationListener {
                         primaryStage.setHeight(700);
                     }
                     break;
+                    
+                case "CUSTOMER_ORDER_HISTORY":
+                	if (params.length > 0) {
+                        currentCustomerId = params[0];
+                        CustomerOrderHistoryView customerOrderHistoryView = new CustomerOrderHistoryView(currentCustomerId);
+                        customerOrderHistoryView.setNavigationListener(this);
+                        primaryStage.setScene(customerOrderHistoryView.getScene());
+                        primaryStage.setWidth(870);
+                        primaryStage.setHeight(620);
+                    }
+                	break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -242,7 +264,9 @@ public class Main extends Application implements NavigationListener {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
         } else if ("COURIER_DETAIL".equals(currentView)) {
             navigateTo("COURIER_LIST", currentCourierId);
-        } else if ("REGISTER".equals(currentView)) {
+        } else if ("COURIER_ORDER_DETAIL".equals(currentView)) {
+			navigateTo("COURIER_LIST", currentCourierId);
+		} else if ("REGISTER".equals(currentView)) {
             navigateTo("LOGIN");
         } else if ("CUSTOMER_LIST".equals(currentView)) {
             navigateTo("LOGIN");
@@ -250,6 +274,8 @@ public class Main extends Application implements NavigationListener {
             navigateTo("LOGIN");
         } else if ("EDIT_PROFILE".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
+        } else if ("CUSTOMER_ORDER_HISTORY".equals(currentView)) {
+        	navigateTo("CUSTOMER_LIST", currentCustomerId);
         }
     }
 
