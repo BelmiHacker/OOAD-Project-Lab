@@ -223,6 +223,17 @@ public class Main extends Application implements NavigationListener {
                         primaryStage.setHeight(700);
                     }
                     break;
+                    
+                case "CUSTOMER_ORDER_HISTORY":
+                	if (params.length > 0) {
+                        currentCustomerId = params[0];
+                        CustomerOrderHistoryView customerOrderHistoryView = new CustomerOrderHistoryView(currentCustomerId);
+                        customerOrderHistoryView.setNavigationListener(this);
+                        primaryStage.setScene(customerOrderHistoryView.getScene());
+                        primaryStage.setWidth(870);
+                        primaryStage.setHeight(620);
+                    }
+                	break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -263,6 +274,8 @@ public class Main extends Application implements NavigationListener {
             navigateTo("LOGIN");
         } else if ("EDIT_PROFILE".equals(currentView)) {
             navigateTo("CUSTOMER_LIST", currentCustomerId);
+        } else if ("CUSTOMER_ORDER_HISTORY".equals(currentView)) {
+        	navigateTo("CUSTOMER_LIST", currentCustomerId);
         }
     }
 
