@@ -1,6 +1,6 @@
 package view;
 
-import controller.CourierController;
+import controller.CourierHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -43,7 +43,7 @@ public class AdminCourierMasterView {
     private TableView<Courier> courierTable;
 
  // Controller untuk mengambil data courier
-    private CourierController cc = new CourierController();
+    private CourierHandler cc = new CourierHandler();
     
     // NavigationListener untuk menghubungkan View dengan Main (Navigation Controller)
     private NavigationListener navigationListener;

@@ -13,14 +13,14 @@ import database.CourierDAO;
  * Bertanggung jawab untuk CRUD operation kurir dan delegasi ke CourierDAO.
  * 
  */
-public class CourierController {
+public class CourierHandler {
     private CourierDAO courierDAO;
 
     /**
      * Constructor untuk CourierController
      * Menginisialisasi CourierDAO untuk akses database
      */
-    public CourierController() {
+    public CourierHandler() {
         this.courierDAO = new CourierDAO();
     }
 

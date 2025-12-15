@@ -1,6 +1,6 @@
 package view;
 
-import controller.DeliveryController;
+import controller.DeliveryHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -19,9 +19,7 @@ import javafx.geometry.Pos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Delivery;
-import model.OrderHeader;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -32,7 +30,7 @@ import java.util.List;
 	    private BorderPane mainLayout;
 	    private TableView<Delivery> deliveryTable;
 
-	    private DeliveryController dc = new DeliveryController();
+	    private DeliveryHandler dc = new DeliveryHandler();
 
 	    private String courierId; // null = mode admin, != null = mode courier
 	    private NavigationListener navigationListener;

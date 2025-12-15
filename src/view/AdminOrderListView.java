@@ -1,8 +1,8 @@
 package view;
 
 import controller.OrderHandler;
-import controller.DeliveryController;
-import controller.CourierController;
+import controller.DeliveryHandler;
+import controller.CourierHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -48,8 +48,8 @@ public class AdminOrderListView {
 	
 	// Handler/Controller untuk ambil data order dan melakukan proses assign courier
 	private OrderHandler oc = new OrderHandler();
-	private DeliveryController dc = new DeliveryController();
-	private CourierController cc = new CourierController();
+	private DeliveryHandler dc = new DeliveryHandler();
+	private CourierHandler cc = new CourierHandler();
 	
 	// NavigationListener menghubungkan View dengan Main (Navigation Controller).
 	private NavigationListener navigationListener;

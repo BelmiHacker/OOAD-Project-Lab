@@ -1,7 +1,7 @@
 package view;
 
 import controller.UserHandler;
-import controller.CourierController;
+import controller.CourierHandler;
 import controller.CustomerHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -43,7 +43,7 @@ public class LoginView {
 	// Handlers
 	private UserHandler uc = new UserHandler();
 	private CustomerHandler cc = new CustomerHandler();
-	private CourierController courierController = new CourierController();
+	private CourierHandler courierController = new CourierHandler();
 	private User loggedInUser;
 	private NavigationListener navigationListener;
 
