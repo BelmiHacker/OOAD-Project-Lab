@@ -1,6 +1,6 @@
 package view;
 
-import controller.DeliveryController;
+import controller.DeliveryHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -26,7 +26,7 @@ public class CourierDetailView {
 	private BorderPane mainLayout;
 
 	// Handler
-	private DeliveryController dc = new DeliveryController();
+	private DeliveryHandler dc = new DeliveryHandler();
 
 	// State
 	private String deliveryId;

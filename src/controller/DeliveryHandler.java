@@ -10,14 +10,14 @@ import database.DeliveryDAO;
  * Bertanggung jawab untuk manajemen pengiriman dan validasi status pengiriman.
  * 
  */
-public class DeliveryController {
+public class DeliveryHandler {
     private DeliveryDAO deliveryDAO;
 
     /**
      * Constructor untuk DeliveryController
      * Menginisialisasi DeliveryDAO untuk akses database
      */
-    public DeliveryController() {
+    public DeliveryHandler() {
         this.deliveryDAO = new DeliveryDAO();
     }
 

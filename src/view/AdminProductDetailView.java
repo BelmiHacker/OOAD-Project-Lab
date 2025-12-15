@@ -57,6 +57,11 @@ public class AdminProductDetailView {
 		scene = new Scene(mainLayout, 900, 700);
 	}
 
+    /**
+     * Mengambil detail produk berdasarkan productId.
+     * Jika productId tidak valid atau produk tidak ditemukan,
+     * akan menampilkan alert error.
+     */
 	private void loadProductDetail() {
 		if (productId == null || productId.isEmpty()) {
 			showAlert("Error", "Product ID tidak valid.");
@@ -70,6 +75,12 @@ public class AdminProductDetailView {
 		}
 	}
 
+    /**
+     * Menyusun layout tampilan:
+     * - Header judul
+     * - Grid detail produk
+     * - Panel tombol aksi (Simpan, Hapus, Kembali)
+     */
 	private void setupLayout() {
 		mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 
@@ -141,6 +152,12 @@ public class AdminProductDetailView {
 		mainLayout.setBottom(buttonPanel);
 	}
 
+    /**
+     * Mengatur event handler untuk tombol:
+     * - Simpan: update stok
+     * - Kembali: kembali ke halaman sebelumnya
+     * - Hapus: hapus produk
+     */
 	private void setupActions() {
 		saveBtn.setOnAction(e -> {
 			if (stockField.getText().isEmpty()) {
@@ -184,6 +201,9 @@ public class AdminProductDetailView {
 		});
 	}
 
+    /**
+     * Menampilkan alert informasi.
+     */
 	private void showAlert(String title, String message) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);
@@ -199,6 +219,9 @@ public class AdminProductDetailView {
 		this.navigationListener = listener;
 	}
 
+	  /**
+     * Inisialisasi seluruh komponen UI.
+     */
 	private void init() {
 		saveBtn = new Button("Simpan");
 		backBtn = new Button("Kembali");

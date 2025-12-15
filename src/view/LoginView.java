@@ -1,6 +1,7 @@
 package view;
 
 import controller.UserHandler;
+import controller.CourierHandler;
 import controller.CustomerHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -18,6 +19,7 @@ import javafx.scene.text.FontWeight;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import model.User;
+import model.Courier;
 import model.Customer;
 
 /**
@@ -41,6 +43,7 @@ public class LoginView {
 	// Handlers
 	private UserHandler uc = new UserHandler();
 	private CustomerHandler cc = new CustomerHandler();
+	private CourierHandler courierController = new CourierHandler();
 	private User loggedInUser;
 	private NavigationListener navigationListener;
 
@@ -121,7 +124,8 @@ public class LoginView {
 							showAlert("Error", "Customer data tidak ditemukan!");
 						}
 					} else if ("courier".equals(loggedInUser.getRole())) {
-						navigationListener.navigateTo("COURIER_LIST", loggedInUser.getIdUser());
+						Courier courier = courierController.getCourierByUserId(loggedInUser.getIdUser());
+						navigationListener.navigateTo("COURIER_LIST", courier.getIdCourier());
 					}
 				}
 			} else {

@@ -1,6 +1,6 @@
 package view;
 
-import controller.DeliveryController;
+import controller.DeliveryHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -19,6 +19,7 @@ import javafx.geometry.Pos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Delivery;
+
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ import java.util.List;
 	    private BorderPane mainLayout;
 	    private TableView<Delivery> deliveryTable;
 
-	    private DeliveryController dc = new DeliveryController();
+	    private DeliveryHandler dc = new DeliveryHandler();
 
 	    private String courierId; // null = mode admin, != null = mode courier
 	    private NavigationListener navigationListener;
@@ -65,9 +66,9 @@ import java.util.List;
 	        buttonPanel.setStyle("-fx-background-color: #f0f0f0;");
 	        buttonPanel.setAlignment(Pos.CENTER_RIGHT);
 
-	        Button detailBtn = new Button("Lihat Detail");
-	        detailBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #2196F3; -fx-text-fill: white;");
-	        detailBtn.setOnAction(e -> {
+	        Button deliveryDetailBtn = new Button("Lihat Detail Pengiriman");
+	        deliveryDetailBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #2196F3; -fx-text-fill: white;");
+	        deliveryDetailBtn.setOnAction(e -> {
 	            Delivery selected = deliveryTable.getSelectionModel().getSelectedItem();
 	            if (selected != null) {
 	                if (navigationListener != null) {
@@ -77,7 +78,20 @@ import java.util.List;
 	                showAlert("Warning", "Pilih pengiriman terlebih dahulu!");
 	            }
 	        });
-
+	        
+	        Button orderDetailBtn = new Button("Lihat Detail Order");
+	        orderDetailBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #3370d4; -fx-text-fill: white;");
+	        orderDetailBtn.setOnAction(e -> {
+		        Delivery selected = deliveryTable.getSelectionModel().getSelectedItem();
+		        if (selected == null) {
+		            showAlert("Warning", "Pilih order dulu.");
+		            return;
+		        }
+		        if (navigationListener != null) {
+		            navigationListener.navigateTo("COURIER_ORDER_DETAIL", selected.getIdOrder());
+		        }
+		    });
+	        
 	        Button updateBtn = new Button("Update Status");
 	        updateBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #FF9800; -fx-text-fill: white;");
 	        updateBtn.setOnAction(e -> {
@@ -119,7 +133,20 @@ import java.util.List;
 	            buttonPanel.getChildren().add(backBtn);
 	        }
 
-	        buttonPanel.getChildren().addAll(detailBtn, updateBtn);
+	        buttonPanel.getChildren().addAll(deliveryDetailBtn, orderDetailBtn, updateBtn);
+	        
+	        // Biar courier bisa logout juga dari app
+	        if(courierId != null) {
+	        	Button backBtn = new Button("Logout");
+	            backBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #6c757d; -fx-text-fill: white;");
+	            backBtn.setOnAction(e -> {
+	                if (navigationListener != null) {
+	                    navigationListener.navigateTo("LOGIN");
+	                }
+	            });
+	            buttonPanel.getChildren().add(backBtn);
+	        }
+	        
 	        mainLayout.setBottom(buttonPanel);
 	    }
 
@@ -164,11 +191,11 @@ import java.util.List;
 	    List<Delivery> deliveries;
 
 	    if (courierId == null || courierId.isEmpty()) {
-	        deliveries = dc.getAllDeliveries(); 
+	        deliveries = dc.getAllDeliveries();
 	    } else {
 	        deliveries = dc.getDeliveriesByCourierId(courierId);
 	    }
-
+	    
 	    if (deliveries != null) {
 	        ObservableList<Delivery> items = FXCollections.observableArrayList(deliveries);
 	        deliveryTable.setItems(items);
