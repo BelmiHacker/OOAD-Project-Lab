@@ -33,7 +33,7 @@ public class Main extends Application implements NavigationListener {
         primaryStage.setTitle("JoymarKet - Digital Marketplace");
         primaryStage.setWidth(1100);
         primaryStage.setHeight(700);
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         
         // Start with product list for admin (hardcoded adminId for testing)
         navigateTo("LOGIN");
@@ -49,13 +49,13 @@ public class Main extends Application implements NavigationListener {
             currentView = viewName;
             
             switch(viewName) {
-                case "ADMIN_LIST":
-                    AdminProductListView adminListView = new AdminProductListView(currentAdminId);
-                    adminListView.setNavigationListener(this);
-                    primaryStage.setScene(adminListView.getScene());
-                    primaryStage.setWidth(1100);
-                    primaryStage.setHeight(700);
-                    break;
+            case "ADMIN_LIST":
+                AdminProductListView adminListView = new AdminProductListView(currentAdminId);
+                adminListView.setNavigationListener(this);   // ✅ TAMBAH INI
+                primaryStage.setScene(adminListView.getScene());
+                primaryStage.setWidth(1100);
+                primaryStage.setHeight(700);
+                break;
                     
                 case "ADMIN_DETAIL":
                     if (params.length > 0) {

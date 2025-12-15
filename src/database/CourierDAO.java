@@ -142,6 +142,31 @@ public class CourierDAO {
         }
         return couriers;
     }
+    
+    /**
+     * Mengambil seluruh ID Courier dari tabel Courier.
+     * Method ini biasanya digunakan untuk proses mapping
+     * atau pengambilan data secara bertahap.
+     *
+     * @return List berisi idCourier
+     */
+    
+    public List<String> getAllCourierIds() {
+        List<String> ids = new ArrayList<>();
+        String sql = "SELECT idCourier FROM Courier";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                ids.add(rs.getString("idCourier"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return ids;
+    }
 
     /**
      * Update data Courier di database
@@ -152,7 +177,7 @@ public class CourierDAO {
     public boolean updateCourier(Courier courier) {
         String sql = "UPDATE Courier SET idUser = ?, vehicleType = ?, vehiclePlate = ? WHERE idCourier = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, courier.getIdUser());
+        	ps.setString(1, courier.getIdUser());
             ps.setString(2, courier.getVehicleType());
             ps.setString(3, courier.getVehiclePlate());
             ps.setString(4, courier.getIdCourier());

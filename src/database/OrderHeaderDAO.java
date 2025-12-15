@@ -153,6 +153,43 @@ public class OrderHeaderDAO {
     }
 
     /**
+     * Mengambil satu OrderHeader berdasarkan idOrder dan idCustomer.
+     *
+     * @param idOrder    ID Order
+     * @param idCustomer ID Customer
+     * @return objek OrderHeader jika ditemukan, null jika tidak ditemukan
+     */
+    
+    /**
+     * Mengambil satu OrderHeader berdasarkan idOrder.
+     *
+     * @param idOrder ID Order
+     * @return OrderHeader jika ditemukan, null jika tidak ditemukan
+     */
+    
+    public OrderHeader getOrderHeaderById(String idOrder) {
+        String sql = "SELECT * FROM OrderHeader WHERE idOrder = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, idOrder);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new OrderHeader(
+                    rs.getString("idOrder"),
+                    rs.getString("idCustomer"),
+                    rs.getString("idPromo"),
+                    rs.getString("status"),
+                    rs.getTimestamp("orderedAt").toLocalDateTime(),
+                    rs.getDouble("totalAmount")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * Mendapatkan semua OrderHeader dari database
      *
      * @return List<OrderHeader> daftar semua OrderHeader
@@ -176,6 +213,22 @@ public class OrderHeaderDAO {
             e.printStackTrace();
         }
         return orders;
+    }
+    
+    public List<String> getAllOrderIds() {
+        List<String> ids = new ArrayList<>();
+        String sql = "SELECT idOrder FROM OrderHeader";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                ids.add(rs.getString("idOrder"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ids;
     }
 
     /**
