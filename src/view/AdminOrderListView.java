@@ -6,7 +6,6 @@ import controller.CourierHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -24,6 +23,7 @@ import javafx.collections.ObservableList;
 import model.OrderHeader;
 import model.Courier;
 import java.util.List;
+
 
 /**
  * AdminOrderListView
@@ -71,7 +71,7 @@ public class AdminOrderListView {
 	private void setupLayout() {
 	    mainLayout.setStyle("-fx-background-color: #f5f5f5;");
 
-	 // Header (judul halaman)
+	    // ==== HEADER (judul halaman) ====
 	    VBox header = new VBox();
 	    header.setStyle("-fx-background-color: #c8dcfa; -fx-padding: 15;");
 	    header.setAlignment(Pos.CENTER_LEFT);
@@ -83,11 +83,11 @@ public class AdminOrderListView {
 	    header.getChildren().add(title);
 	    mainLayout.setTop(header);
 
-	 // Table (daftar order)
+	    // ==== TABLE (daftar order) ====
 	    setupTable();
 	    mainLayout.setCenter(orderTable);
 
-	 // Panel assign courier (di atas tombol bawah)
+	    // ==== ASSIGN PANEL (popup) ====
 	    VBox assignPanel = new VBox(10);
 	    assignPanel.setPadding(new Insets(15));
 	    assignPanel.setStyle("-fx-background-color: #f0f0f0;");
@@ -95,80 +95,15 @@ public class AdminOrderListView {
 	    HBox courierPanel = new HBox(10);
 	    courierPanel.setAlignment(Pos.CENTER_LEFT);
 
-	    Label courierLabel = new Label("Pilih Courier:");
+	    Label courierLabel = new Label("Assign Courier ke Order terpilih:");
 	    courierLabel.setFont(Font.font("Arial", 12));
 
-	 // ComboBox untuk memilih courier
-	    ComboBox<Courier> courierCombo = new ComboBox<>();
-	    courierCombo.setPrefWidth(250);
+	    Button assignPopupBtn = new Button("Assign Courier (Popup)");
+	    assignPopupBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; "
+	            + "-fx-background-color: #4CAF50; -fx-text-fill: white;");
+	    assignPopupBtn.setOnAction(e -> openAssignCourierPopup());
 
-	 // Ambil semua courier lalu isi ke ComboBox
-	    List<String> courierIds = cc.getAllCourierIds();
-	    ObservableList<Courier> courierList = FXCollections.observableArrayList();
-
-	    if (courierIds != null) {
-	        for (String id : courierIds) {
-	            Courier c = cc.getCourierById(id);
-	            if (c != null) courierList.add(c);
-	        }
-	    }
-	    courierCombo.setItems(courierList);
-		     // Custom tampilan item di dropdown
-	        courierCombo.setCellFactory(col -> new javafx.scene.control.ListCell<Courier>() {
-	            @Override
-	            protected void updateItem(Courier courier, boolean empty) {
-	                super.updateItem(courier, empty);
-	                setText(empty ? null : courier.getIdCourier() + " - " + courier.getVehicleType());
-	            }
-	        });
-	        
-	     // Custom tampilan item yang terpilih
-	        courierCombo.setButtonCell(new javafx.scene.control.ListCell<Courier>() {
-	            @Override
-	            protected void updateItem(Courier courier, boolean empty) {
-	                super.updateItem(courier, empty);
-	                setText(empty ? null : courier.getIdCourier() + " - " + courier.getVehicleType());
-	            }
-	        });
-	    
-
-	 // Tombol untuk assign courier ke order yang dipilih
-	    Button assignBtn = new Button("Assign Courier");
-	    assignBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #4CAF50; -fx-text-fill: white;");
-	    assignBtn.setOnAction(e -> {
-	    	// Ambil order yang dipilih dari tabel dan courier yang dipilih dari combobox
-	        OrderHeader selected = orderTable.getSelectionModel().getSelectedItem();
-	        Courier selectedCourier = courierCombo.getSelectionModel().getSelectedItem();
-
-	     // Validasi: harus pilih order terlebih dahulu
-	        if (selected == null) {
-	            showAlert("Warning", "Pilih order terlebih dahulu!");
-	            return;
-	        }
-
-	     // Validasi: harus pilih courier terlebih dahulu
-	        if (selectedCourier == null) {
-	            showAlert("Warning", "Pilih courier terlebih dahulu!");
-	            return;
-	        }
-
-	     // Generate id delivery sederhana (berbasis timestamp)
-	        String deliveryId = "DEL_" + System.currentTimeMillis();
-	        
-	        // Proses assign courier melalui controller
-	        String result = dc.assignCourier(deliveryId, selected.getIdOrder(), selectedCourier.getIdCourier());
-
-	     // Jika sukses, reload tabel; jika gagal, tampilkan pesan error
-	        if ("success".equals(result)) {
-	            showAlert("Sukses", "Courier berhasil di-assign ke order!");
-	            loadOrders();
-	            courierCombo.getSelectionModel().clearSelection();
-	        } else {
-	            showAlert("Error", "Gagal assign courier: " + result);
-	        }
-	    });
-
-	    courierPanel.getChildren().addAll(courierLabel, courierCombo, assignBtn);
+	    courierPanel.getChildren().addAll(courierLabel, assignPopupBtn);
 	    assignPanel.getChildren().add(courierPanel);
 
 	    // ==== PANEL TOMBOL BAWAH ====
@@ -177,27 +112,19 @@ public class AdminOrderListView {
 	    buttonPanel.setStyle("-fx-background-color: #f0f0f0;");
 	    buttonPanel.setAlignment(Pos.CENTER_RIGHT);
 
-	    // Tombol untuk membuka halaman detail dari order yang dipilih pada tabel.
-	    // Tombol ini hanya bekerja jika user sudah memilih order
 	    Button detailBtn = new Button("Lihat Detail Order");
 	    detailBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #2196F3; -fx-text-fill: white;");
 	    detailBtn.setOnAction(e -> {
 	        OrderHeader selected = orderTable.getSelectionModel().getSelectedItem();
-	        
-	     // Validasi: user harus memilih order dulu
 	        if (selected == null) {
 	            showAlert("Warning", "Pilih order dulu.");
 	            return;
 	        }
-	     // Navigasi ke view detail order melalui NavigationListener
 	        if (navigationListener != null) {
 	            navigationListener.navigateTo("ADMIN_ORDER_DETAIL", selected.getIdOrder());
 	        }
 	    });
 
-
-	    // Tombol kembali ke halaman sebelumnya.
-	    // Navigasi ditangani oleh Main melalui method goBack()
 	    Button backBtn = new Button("Kembali");
 	    backBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #999999; -fx-text-fill: white;");
 	    backBtn.setOnAction(e -> {
@@ -208,12 +135,95 @@ public class AdminOrderListView {
 
 	    buttonPanel.getChildren().addAll(detailBtn, backBtn);
 
-	 // Bottom berisi 2 bagian: panel assign (atas) + panel tombol (bawah)
+	    // ==== BOTTOM BOX (gabung assignPanel + buttonPanel) ====
 	    VBox bottomBox = new VBox();
 	    bottomBox.getChildren().addAll(assignPanel, buttonPanel);
 	    mainLayout.setBottom(bottomBox);
 	}
 	
+    private void openAssignCourierPopup() {
+        OrderHeader selectedOrder = orderTable.getSelectionModel().getSelectedItem();
+        if (selectedOrder == null) {
+            showAlert("Warning", "Pilih order terlebih dahulu!");
+            return;
+        }
+        
+     // CEK: kalau order sudah pernah di-assign, jangan boleh assign lagi
+
+        javafx.stage.Stage popup = new javafx.stage.Stage();
+        popup.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        popup.setTitle("Pilih Courier untuk Order: " + selectedOrder.getIdOrder());
+
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(15));
+
+        Label title = new Label("Pilih Courier");
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+
+        TableView<Courier> courierTable = new TableView<>();
+        courierTable.setPrefHeight(250);
+
+        TableColumn<Courier, String> idCol = new TableColumn<>("ID Courier");
+        idCol.setCellValueFactory(new PropertyValueFactory<>("idCourier"));
+        idCol.setPrefWidth(150);
+
+        TableColumn<Courier, String> vehicleCol = new TableColumn<>("Vehicle");
+        vehicleCol.setCellValueFactory(new PropertyValueFactory<>("vehicleType"));
+        vehicleCol.setPrefWidth(200);
+
+        courierTable.getColumns().addAll(idCol, vehicleCol);
+
+        // Load courier list (pakai handler kamu yang sudah ada)
+        ObservableList<Courier> courierList = FXCollections.observableArrayList();
+        List<String> courierIds = cc.getAllCourierIds();
+
+        if (courierIds != null) {
+            for (String id : courierIds) {
+                Courier c = cc.getCourierById(id);
+                if (c != null) courierList.add(c);
+            }
+        }
+        courierTable.setItems(courierList);
+
+        Button assign = new Button("Assign");
+        Button cancel = new Button("Cancel");
+
+        assign.setOnAction(ev -> {
+            Courier selectedCourier = courierTable.getSelectionModel().getSelectedItem();
+            if (selectedCourier == null) {
+                showAlert("Warning", "Pilih courier terlebih dahulu!");
+                return;
+            }
+
+            boolean alreadyAssigned = dc.isOrderAlreadyAssigned(selectedOrder.getIdOrder());
+            if (alreadyAssigned) {
+                showAlert("Warning", "Order ini sudah di-assign ke courier. Tidak bisa di-assign lagi.");
+                return;
+            }
+
+            String deliveryId = "DEL_" + System.currentTimeMillis();
+            String result = dc.assignCourier(deliveryId, selectedOrder.getIdOrder(), selectedCourier.getIdCourier());
+
+            if ("success".equals(result)) {
+                showAlert("Sukses", "Courier berhasil di-assign ke order!");
+                loadOrders();
+                popup.close();
+            } else {
+                showAlert("Error", "Gagal assign courier: " + result);
+            }
+        });
+
+        cancel.setOnAction(ev -> popup.close());
+
+        HBox actions = new HBox(10, assign, cancel);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        root.getChildren().addAll(title, courierTable, actions);
+
+        popup.setScene(new Scene(root, 420, 330));
+        popup.showAndWait();
+    }
+
 	// Menyiapkan kolom-kolom TableView untuk OrderHeader dan mapping ke field model
 	@SuppressWarnings("unchecked")
 	private void setupTable() {

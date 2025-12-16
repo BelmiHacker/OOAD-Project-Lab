@@ -48,6 +48,30 @@ public class DeliveryDAO {
             return "DELIV_00001";
         }
     }
+    
+    /**
+     * Mengecek apakah sebuah order sudah pernah di-assign ke courier.
+     * Digunakan untuk mencegah pembuatan delivery ganda untuk order yang sama.
+     *
+     * @param orderId ID order yang ingin dicek
+     * @return true jika order sudah memiliki delivery, false jika belum
+     */
+    public boolean isOrderAlreadyAssigned(String orderId) {
+        String sql = "SELECT 1 FROM Delivery WHERE idOrder = ? LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, orderId);
+            // Eksekusi query
+            ResultSet rs = ps.executeQuery();
+         // Jika ada hasil (rs.next() == true), berarti order sudah pernah di-assign
+            return rs.next();
+        } catch (SQLException e) {
+        	// Menangani error database (misalnya query gagal atau koneksi bermasalah)
+            e.printStackTrace();
+        }
+     // Default: order belum pernah di-assign
+        return false;
+    }
+
 
     /**
      * Insert Delivery baru ke database
