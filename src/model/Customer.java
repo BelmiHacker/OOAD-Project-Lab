@@ -18,6 +18,7 @@ public class Customer extends User {
 
     public Customer(String idCustomer, String idUser, double balance) {
         this.idCustomer = idCustomer;
+        this.setIdUser(idUser);
         this.balance = balance;
     }
 
