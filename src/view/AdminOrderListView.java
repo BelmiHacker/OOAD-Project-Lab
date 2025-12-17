@@ -85,8 +85,13 @@ public class AdminOrderListView {
 
 	    // ==== TABLE (daftar order) ====
 	    setupTable();
-	    mainLayout.setCenter(orderTable);
-
+	    
+	    Label emptyLabel = new Label("No order available");
+	    emptyLabel.setStyle("-fx-font-size: 16; -fx-text-fill: #666;");
+	    orderTable.setPlaceholder(emptyLabel);
+	    
+	    mainLayout.setCenter(orderTable); 
+	    
 	    // ==== ASSIGN PANEL (popup) ====
 	    VBox assignPanel = new VBox(10);
 	    assignPanel.setPadding(new Insets(15));
@@ -98,7 +103,7 @@ public class AdminOrderListView {
 	    Label courierLabel = new Label("Assign Courier ke Order terpilih:");
 	    courierLabel.setFont(Font.font("Arial", 12));
 
-	    Button assignPopupBtn = new Button("Assign Courier (Popup)");
+	    Button assignPopupBtn = new Button("Assign Courier");
 	    assignPopupBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; "
 	            + "-fx-background-color: #4CAF50; -fx-text-fill: white;");
 	    assignPopupBtn.setOnAction(e -> openAssignCourierPopup());
@@ -185,7 +190,7 @@ public class AdminOrderListView {
         }
         courierTable.setItems(courierList);
 
-        Button assign = new Button("Assign");
+        Button assign = new Button("Update");
         Button cancel = new Button("Cancel");
 
         assign.setOnAction(ev -> {
@@ -270,19 +275,19 @@ public class AdminOrderListView {
 	
 	// Mengambil semua order dari OrderHandler lalu menampilkan ke TableView
 	private void loadOrders() {
-	    List<String> orderIds = oc.getAllOrderIds(); // method yang kamu sudah punya
-
+	    List<String> orderIds = oc.getAllOrderIds();
 	    ObservableList<OrderHeader> items = FXCollections.observableArrayList();
 
 	    if (orderIds != null) {
 	        for (String idOrder : orderIds) {
-	            OrderHeader oh = oc.getOrderHeader(idOrder); // method yang kamu sudah tambah
+	            OrderHeader oh = oc.getOrderHeader(idOrder);
 	            if (oh != null) items.add(oh);
 	        }
 	    }
 
-	    orderTable.setItems(items);
+	    orderTable.setItems(items); 
 	}
+
 	
 	// Helper untuk menampilkan alert informasi (warning/sukses/error)
 	private void showAlert(String title, String message) {
