@@ -5,6 +5,7 @@ import controller.OrderHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -63,7 +64,13 @@ import java.util.List;
 	        mainLayout.setTop(header);
 
 	        setupTable();
+
+	        Label emptyLabel = new Label("No Order Available");
+	        emptyLabel.setStyle("-fx-font-size: 16; -fx-text-fill: #666;");
+	        deliveryTable.setPlaceholder(emptyLabel);
+
 	        mainLayout.setCenter(deliveryTable);
+
 
 	        HBox buttonPanel = new HBox(10);
 	        buttonPanel.setPadding(new Insets(15));
@@ -148,6 +155,9 @@ import java.util.List;
 	 * Setup Table
 	 */
 	private void setupTable() {
+		
+		deliveryTable.setPlaceholder(new Label("No Assigned Delivery Available"));
+		
 		TableColumn<Delivery, String> idCol = new TableColumn<>("ID Pengiriman");
 		idCol.setCellValueFactory(new PropertyValueFactory<>("idDelivery"));
 		idCol.setPrefWidth(120);
@@ -164,16 +174,8 @@ import java.util.List;
 		statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
 		statusCol.setPrefWidth(100);
 		
-		TableColumn<Delivery, String> addressCol = new TableColumn<>("Alamat Tujuan");
-		addressCol.setCellValueFactory(new PropertyValueFactory<>("addressDelivery"));
-		addressCol.setPrefWidth(250);
-		
-		TableColumn<Delivery, String> dateCol = new TableColumn<>("Tanggal Pengiriman");
-		dateCol.setCellValueFactory(new PropertyValueFactory<>("dateDelivery"));
-		dateCol.setPrefWidth(150);
-		
 		@SuppressWarnings("unchecked")
-		TableColumn<Delivery, ?>[] columns = new TableColumn[] {idCol, orderCol, courierCol, statusCol, addressCol, dateCol};
+		TableColumn<Delivery, ?>[] columns = new TableColumn[] {idCol, orderCol, courierCol, statusCol};
 		deliveryTable.getColumns().addAll(columns);
 	}
 
@@ -188,13 +190,15 @@ import java.util.List;
 	    } else {
 	        deliveries = dc.getDeliveriesByCourierId(courierId);
 	    }
-	    
-	    if (deliveries != null) {
-	        ObservableList<Delivery> items = FXCollections.observableArrayList(deliveries);
-	        deliveryTable.setItems(items);
-	    }
-	}
 
+	    ObservableList<Delivery> items = FXCollections.observableArrayList();
+
+	    if (deliveries != null) {
+	        items.addAll(deliveries);
+	    }
+
+	    deliveryTable.setItems(items); 
+	}
 	/**
 	 * Show Alert
 	 */
@@ -227,8 +231,13 @@ import java.util.List;
 	    
 	    alert.getDialogPane().setContent(dialogContent);
 	    
+	    ButtonType updateButton = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
+	    ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+	    alert.getButtonTypes().setAll(updateButton, cancelButton);
+	    
 	    ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
-	    if (result == ButtonType.OK) {
+	    if (result == updateButton) {
 	        String newStatus = statusComboBox.getValue();
 	        
 	        if (newStatus != null && !newStatus.isEmpty()) {
