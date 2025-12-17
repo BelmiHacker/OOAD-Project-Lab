@@ -220,7 +220,7 @@ public class CustomerProductDetailView {
 
 	// Inisialisasi komponen UI
 	private void init() {
-		addToCartBtn = new Button("Tambah ke Keranjang");
+		addToCartBtn = new Button("Store");
 		backBtn = new Button("Kembali");
 		
 		idLabel = new Label("ID Produk:");

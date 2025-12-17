@@ -120,7 +120,7 @@ public class CartView {
 		TableColumn<CartItem, Void> actionCol = new TableColumn<>("Aksi");
 		actionCol.setPrefWidth(160);
 		actionCol.setCellFactory(col -> new TableCell<>() {
-			private final Button editBtn = new Button("Edit");
+			private final Button editBtn = new Button("Update");
 			private final Button delBtn = new Button("Hapus");
 			private final HBox box = new HBox(8, editBtn, delBtn);
 

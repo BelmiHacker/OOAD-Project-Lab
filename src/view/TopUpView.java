@@ -145,7 +145,7 @@ public class TopUpView {
 				double newBalance = cc.getBalance(customerId);
 				// refresh displayed balance
 				balanceValue.setText("Rp " + String.format("%,.0f", newBalance));
-				showAlert("Sukses", "Top up sebesar Rp " + String.format("%,.0f", amount) + " berhasil!\n\nSaldo baru: Rp " + String.format("%,.0f", newBalance));
+				showAlert("Top Up Successful", "Top Up berhasil sebesar Rp " + String.format("%,.0f", amount) + " berhasil!\n\nSaldo baru: Rp " + String.format("%,.0f", newBalance));
 				amountField.clear();
 			} else {
 				showAlert("Error", "Gagal melakukan top up: " + result);
@@ -178,7 +178,7 @@ public class TopUpView {
 		mainLayout = new BorderPane();
 		formLayout = new GridPane();
 		amountField = new TextField();
-		topUpBtn = new Button("Top Up Sekarang");
+		topUpBtn = new Button("Top Up");
 		backBtn = new Button("Kembali");
 		balanceValue = new Label();
 	}

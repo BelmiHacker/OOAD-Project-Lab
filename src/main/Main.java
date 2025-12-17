@@ -3,8 +3,6 @@ package main;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import view.*;
-import controller.OrderHandler;
-import model.OrderHeader;
 import view.AdminOrderDetailView;
 
 
@@ -216,7 +214,7 @@ public class Main extends Application implements NavigationListener {
                 case "EDIT_PROFILE":
                     if (params.length > 0) {
                         currentUserId = params[0];
-                        ProfileView profileView = new ProfileView(currentUserId);
+                        EditProfileView profileView = new EditProfileView(currentUserId);
                         profileView.setNavigationListener(this);
                         primaryStage.setScene(profileView.getScene());
                         primaryStage.setWidth(900);

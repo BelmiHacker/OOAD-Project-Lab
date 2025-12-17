@@ -112,7 +112,7 @@ public class CustomerProductListView {
 			}
 		});
 
-		Button cartBtn = new Button("Buka Cart");
+		Button cartBtn = new Button("Cart");
 		cartBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #FF9800; -fx-text-fill: white;");
 		cartBtn.setOnAction(e -> {
 			if (navigationListener != null) {
@@ -120,7 +120,7 @@ public class CustomerProductListView {
 			}
 		});
 
-		Button topUpBtn = new Button("Top Up Saldo");
+		Button topUpBtn = new Button("Top Up");
 		topUpBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #9C27B0; -fx-text-fill: white;");
 		topUpBtn.setOnAction(e -> {
 			if (navigationListener != null) {
@@ -135,7 +135,7 @@ public class CustomerProductListView {
 				navigationListener.navigateTo("EDIT_PROFILE", userId);
 			}
 		});
-		
+
 		Button orderHistoryBtn = new Button("Sejarah Belanja");
 		orderHistoryBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #903bd1; -fx-text-fill: white;");
 		orderHistoryBtn.setOnAction(e -> {
@@ -143,7 +143,7 @@ public class CustomerProductListView {
 				navigationListener.navigateTo("CUSTOMER_ORDER_HISTORY", customerId);
 			}
 		});
-		
+
 		Button logoutBtn = new Button("Logout");
 		logoutBtn.setStyle("-fx-font-size: 11; -fx-padding: 6 15; -fx-background-color: #999999; -fx-text-fill: white;");
 		logoutBtn.setOnAction(e -> {
@@ -198,9 +198,9 @@ public class CustomerProductListView {
 		stockCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
 		stockCol.setPrefWidth(100);
 
-		// Action column: Detail + Add to Cart (+ Spinner)
+		// Action column: only Detail button
 		TableColumn<Product, Void> actionCol = new TableColumn<>("Aksi");
-		actionCol.setPrefWidth(300);
+		actionCol.setPrefWidth(120);
 		actionCol.setCellFactory(col -> new javafx.scene.control.TableCell<>() {
 			private final HBox box = new HBox(8);
 			{
@@ -227,47 +227,8 @@ public class CustomerProductListView {
 					}
 				});
 
-				int stock = Math.max(0, product.getStock());
-				int spinnerMax = Math.max(1, stock);
-				SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory =
-						new SpinnerValueFactory.IntegerSpinnerValueFactory(1, spinnerMax, 1);
-				Spinner<Integer> quantitySpinner = new Spinner<>(valueFactory);
-				quantitySpinner.setPrefWidth(80);
-
-				Button addBtn = new Button("Tambah ke Keranjang");
-				addBtn.setStyle("-fx-font-size: 11; -fx-padding: 4 8; -fx-background-color: #FF9800; -fx-text-fill: white;");
-
-				// Disable add if no stock
-				if (stock <= 0) {
-					addBtn.setDisable(true);
-					quantitySpinner.setDisable(true);
-				}
-
-				addBtn.setOnAction(e -> {
-					int quantity = quantitySpinner.getValue();
-
-					if (quantity <= 0) {
-						showAlert("Error", "Kuantitas harus lebih dari 0!");
-						return;
-					}
-
-					if (quantity > product.getStock()) {
-						showAlert("Error", "Stok tidak cukup! Stok tersedia: " + product.getStock());
-						return;
-					}
-
-					String productId = product.getIdProduct();
-					String result = cic.createCartItem(customerId, productId, quantity);
-					if ("success".equals(result)) {
-						showAlert("Sukses", "Produk berhasil ditambahkan ke keranjang!");
-						quantitySpinner.getValueFactory().setValue(1);
-					} else {
-						showAlert("Error", result);
-					}
-				});
-
 				box.getChildren().clear();
-				box.getChildren().addAll(detailBtn, quantitySpinner, addBtn);
+				box.getChildren().add(detailBtn);
 				setGraphic(box);
 			}
 		});
