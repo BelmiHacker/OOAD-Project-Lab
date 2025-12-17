@@ -19,7 +19,7 @@ import javafx.geometry.Pos;
 /**
  * ProfileView - JavaFX view untuk halaman edit profil pengguna
  */
-public class ProfileView {
+public class EditProfileView {
     // UI Components
     private Scene scene;
     private BorderPane mainLayout;
@@ -51,7 +51,7 @@ public class ProfileView {
     private String userId;
 
     // Constructor that accepts userId and loads data immediately
-    public ProfileView(String userId) {
+    public EditProfileView(String userId) {
         this.userId = userId;
         init();
         setupLayout();
@@ -230,7 +230,7 @@ public class ProfileView {
 
     // Inisialisasi komponen UI
     private void init() {
-        saveBtn = new Button("Simpan");
+        saveBtn = new Button("Update");
         backBtn = new Button("Kembali");
 
         fullNameTF = new TextField();
