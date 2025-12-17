@@ -105,26 +105,7 @@ public class CourierDetailView {
 		statusTF.setPrefWidth(300);
 		statusBox.getChildren().addAll(statusLabel, statusTF);
 		
-		// Delivery Address
-		VBox addressBox = new VBox(5);
-		Label addressLabel = new Label("Alamat Tujuan:");
-		addressLabel.setStyle("-fx-font-weight: bold;");
-		TextArea addressTA = new TextArea();
-		addressTA.setEditable(false);
-		addressTA.setPrefHeight(100);
-		addressTA.setWrapText(true);
-		addressBox.getChildren().addAll(addressLabel, addressTA);
-		
-		// Delivery Date
-		HBox dateBox = new HBox(15);
-		Label dateLabel = new Label("Tanggal Pengiriman:");
-		dateLabel.setStyle("-fx-font-weight: bold; -fx-min-width: 150;");
-		TextField dateTF = new TextField();
-		dateTF.setEditable(false);
-		dateTF.setPrefWidth(300);
-		dateBox.getChildren().addAll(dateLabel, dateTF);
-		
-		content.getChildren().addAll(idBox, orderBox, courierBox, statusBox, addressBox, dateBox);
+		content.getChildren().addAll(idBox, orderBox, courierBox, statusBox);
 		mainLayout.setCenter(content);
 		
 		// Button Panel
@@ -177,8 +158,6 @@ public class CourierDetailView {
 		orderTF.setText(delivery != null ? delivery.getIdOrder() : "");
 		courierTF.setText(delivery != null ? delivery.getIdCourier() : "");
 		statusTF.setText(delivery != null ? delivery.getStatus() : "");
-		addressTA.setText(delivery != null ? (delivery.getAddressDelivery() != null ? delivery.getAddressDelivery() : "") : "");
-		dateTF.setText(delivery != null ? (delivery.getDateDelivery() != null ? delivery.getDateDelivery() : "") : "");
 	}
 
 	/**
