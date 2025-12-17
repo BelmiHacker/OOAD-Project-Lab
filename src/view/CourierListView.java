@@ -5,6 +5,7 @@ import controller.OrderHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -148,6 +149,9 @@ import java.util.List;
 	 * Setup Table
 	 */
 	private void setupTable() {
+		
+		deliveryTable.setPlaceholder(new Label("No Assigned Delivery Available"));
+		
 		TableColumn<Delivery, String> idCol = new TableColumn<>("ID Pengiriman");
 		idCol.setCellValueFactory(new PropertyValueFactory<>("idDelivery"));
 		idCol.setPrefWidth(120);
@@ -227,8 +231,13 @@ import java.util.List;
 	    
 	    alert.getDialogPane().setContent(dialogContent);
 	    
+	    ButtonType updateButton = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
+	    ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+	    alert.getButtonTypes().setAll(updateButton, cancelButton);
+	    
 	    ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
-	    if (result == ButtonType.OK) {
+	    if (result == updateButton) {
 	        String newStatus = statusComboBox.getValue();
 	        
 	        if (newStatus != null && !newStatus.isEmpty()) {
