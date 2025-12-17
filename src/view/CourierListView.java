@@ -1,9 +1,12 @@
 package view;
 
 import controller.DeliveryHandler;
+import controller.OrderHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -31,6 +34,7 @@ import java.util.List;
 	    private TableView<Delivery> deliveryTable;
 
 	    private DeliveryHandler dc = new DeliveryHandler();
+	    private OrderHandler oc = new OrderHandler();
 
 	    private String courierId; // null = mode admin, != null = mode courier
 	    private NavigationListener navigationListener;
@@ -91,35 +95,7 @@ import java.util.List;
 		            navigationListener.navigateTo("COURIER_ORDER_DETAIL", selected.getIdOrder());
 		        }
 		    });
-	        
-	        Button updateBtn = new Button("Update Status");
-	        updateBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #FF9800; -fx-text-fill: white;");
-	        updateBtn.setOnAction(e -> {
-	            Delivery selected = deliveryTable.getSelectionModel().getSelectedItem();
-	            if (selected != null) {
-	                String currentStatus = selected.getStatus();
-	                String newStatus;
-
-	                if ("pending".equals(currentStatus)) {
-	                    newStatus = "in progress";
-	                } else if ("in progress".equals(currentStatus)) {
-	                    newStatus = "delivered";
-	                } else {
-	                    showAlert("Info", "Pengiriman sudah delivered, tidak bisa di-update lagi.");
-	                    return;
-	                }
-
-	                String result = dc.updateDeliveryStatus(selected.getIdDelivery(), newStatus);
-	                if ("success".equals(result)) {
-	                    showAlert("Sukses", "Status pengiriman diperbarui menjadi " + newStatus);
-	                    loadDeliveries();
-	                } else {
-	                    showAlert("Error", "Gagal update status: " + result);
-	                }
-	            } else {
-	                showAlert("Warning", "Pilih pengiriman terlebih dahulu!");
-	            }
-	        });
+	       	        
 
 	        // Tombol kembali hanya untuk MODE ADMIN (courierId == null)
 	        if (courierId == null) {
@@ -133,18 +109,35 @@ import java.util.List;
 	            buttonPanel.getChildren().add(backBtn);
 	        }
 
-	        buttonPanel.getChildren().addAll(deliveryDetailBtn, orderDetailBtn, updateBtn);
+	        buttonPanel.getChildren().addAll(deliveryDetailBtn, orderDetailBtn);
+	        
+	        if (courierId != null) {
+	        	Button updateBtn = new Button("Update Status");
+	        	updateBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #FF9800; -fx-text-fill: white;");
+	        	updateBtn.setOnAction(e -> {
+	        		Delivery selected = deliveryTable.getSelectionModel().getSelectedItem();
+	        		
+	        		if (selected == null) {
+	        			showAlert("Warning", "Pilih pengiriman terlebih dahulu!");
+	        			return;
+	        		}
+	        		
+	        		showUpdateStatusAlert(selected);
+	        	});
+	        	
+	        	buttonPanel.getChildren().add(updateBtn);
+			}
 	        
 	        // Biar courier bisa logout juga dari app
 	        if(courierId != null) {
-	        	Button backBtn = new Button("Logout");
-	            backBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #6c757d; -fx-text-fill: white;");
-	            backBtn.setOnAction(e -> {
+	        	Button logoutBtn = new Button("Logout");
+	            logoutBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #6c757d; -fx-text-fill: white;");
+	            logoutBtn.setOnAction(e -> {
 	                if (navigationListener != null) {
 	                    navigationListener.navigateTo("LOGIN");
 	                }
 	            });
-	            buttonPanel.getChildren().add(backBtn);
+	            buttonPanel.getChildren().add(logoutBtn);
 	        }
 	        
 	        mainLayout.setBottom(buttonPanel);
@@ -211,7 +204,55 @@ import java.util.List;
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-
+	
+	private void showUpdateStatusAlert(Delivery selected) {
+	    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+	    alert.setTitle("Update Status");
+	    alert.setHeaderText("Update Delivery Status");
+	    
+	    ComboBox<String> statusComboBox = new ComboBox<>();
+	    statusComboBox.getItems().addAll("pending", "in progress", "delivered");
+	    statusComboBox.setValue(selected.getStatus());
+	    statusComboBox.setPrefWidth(200);
+	    
+	    VBox dialogContent = new VBox(10);
+	    dialogContent.setPadding(new Insets(10));
+	    dialogContent.getChildren().addAll(
+	        new Label("Delivery ID: " + selected.getIdDelivery()),
+	        new Label("Order ID: " + selected.getIdOrder()),
+	        new Label("Current Status: " + selected.getStatus()),
+	        new Label("Select New Status:"),
+	        statusComboBox
+	    );
+	    
+	    alert.getDialogPane().setContent(dialogContent);
+	    
+	    ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
+	    if (result == ButtonType.OK) {
+	        String newStatus = statusComboBox.getValue();
+	        
+	        if (newStatus != null && !newStatus.isEmpty()) {
+	            String deliveryUpdateResult = dc.updateDeliveryStatus(selected.getIdDelivery(), newStatus);
+	            
+	            if ("success".equals(deliveryUpdateResult)) {
+	                String orderUpdateResult = oc.editOrderHeaderStatus(selected.getIdOrder(), newStatus);
+	                
+	                if ("success".equals(orderUpdateResult)) {
+	                    loadDeliveries();
+	                    showAlert("Sukses", "Status pengiriman dan order diperbarui menjadi " + newStatus);
+	                } else {
+	                    showAlert("Warning", "Status pengiriman berhasil diperbarui, tetapi gagal update status order: " + orderUpdateResult);
+	                    loadDeliveries();
+	                }
+	            } else {
+	                showAlert("Error", "Gagal update status pengiriman: " + deliveryUpdateResult);
+	            }
+	        } else {
+	            showAlert("Warning", "Please select a status from the dropdown.");
+	        }
+	    }
+	}
+	
 	// Getter and Setter
 	public Scene getScene() {
 		return scene;
