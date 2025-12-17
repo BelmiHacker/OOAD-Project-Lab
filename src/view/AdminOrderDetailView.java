@@ -88,7 +88,6 @@ public class AdminOrderDetailView {
             showAlert("Error", "Order dengan ID " + orderId + " tidak ditemukan.");
         }
     }
-
     
     // Menyusun tampilan UI:
     // - Top: header informasi order (ID, customer, status)

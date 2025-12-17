@@ -20,6 +20,10 @@ public class DeliveryHandler {
     public DeliveryHandler() {
         this.deliveryDAO = new DeliveryDAO();
     }
+    
+    public boolean isOrderAlreadyAssigned(String orderId) {
+        return deliveryDAO.isOrderAlreadyAssigned(orderId);
+    }
 
     /**
      * Assign kurir untuk pengiriman
@@ -35,12 +39,18 @@ public class DeliveryHandler {
             return "Kurir harus dipilih";
         }
 
+        // CEK DOUBLE ASSIGN (server-side validation)
+        if (deliveryDAO.isOrderAlreadyAssigned(idOrder)) {
+            return "Order sudah pernah di-assign";
+        }
+
         Delivery delivery = new Delivery(idDelivery, idOrder, idCourier, "pending");
         if (deliveryDAO.insertDelivery(delivery)) {
             return "success";
         }
         return "Assign kurir gagal";
     }
+
 
     /**
      * Update status pengiriman
@@ -64,6 +74,8 @@ public class DeliveryHandler {
         }
         return "Update status pengiriman gagal";
     }
+    
+    
 
     /**
      * Mendapatkan delivery berdasarkan ID
