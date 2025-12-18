@@ -168,16 +168,8 @@ import java.util.List;
 		statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
 		statusCol.setPrefWidth(100);
 		
-		TableColumn<Delivery, String> addressCol = new TableColumn<>("Alamat Tujuan");
-		addressCol.setCellValueFactory(new PropertyValueFactory<>("addressDelivery"));
-		addressCol.setPrefWidth(250);
-		
-		TableColumn<Delivery, String> dateCol = new TableColumn<>("Tanggal Pengiriman");
-		dateCol.setCellValueFactory(new PropertyValueFactory<>("dateDelivery"));
-		dateCol.setPrefWidth(150);
-		
 		@SuppressWarnings("unchecked")
-		TableColumn<Delivery, ?>[] columns = new TableColumn[] {idCol, orderCol, courierCol, statusCol, addressCol, dateCol};
+		TableColumn<Delivery, ?>[] columns = new TableColumn[] {idCol, orderCol, courierCol, statusCol};
 		deliveryTable.getColumns().addAll(columns);
 	}
 
