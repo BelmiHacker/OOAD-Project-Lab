@@ -1,11 +1,14 @@
 package view;
 
 import controller.DeliveryHandler;
+import controller.OrderHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -27,12 +30,16 @@ public class CourierDetailView {
 
 	// Handler
 	private DeliveryHandler dc = new DeliveryHandler();
+	private OrderHandler oc = new OrderHandler();
 
 	// State
 	private String deliveryId;
 	private NavigationListener navigationListener;
 	
 	private Delivery delivery;
+	
+	// Buat reference saat update status
+	private TextField statusTF;
 
 	// Constructor
 	public CourierDetailView(String deliveryId, String courierId) {
@@ -100,7 +107,7 @@ public class CourierDetailView {
 		HBox statusBox = new HBox(15);
 		Label statusLabel = new Label("Status:");
 		statusLabel.setStyle("-fx-font-weight: bold; -fx-min-width: 150;");
-		TextField statusTF = new TextField();
+		statusTF = new TextField();
 		statusTF.setEditable(false);
 		statusTF.setPrefWidth(300);
 		statusBox.getChildren().addAll(statusLabel, statusTF);
@@ -117,28 +124,9 @@ public class CourierDetailView {
 		Button updateBtn = new Button("Update Status");
 		updateBtn.setStyle("-fx-font-size: 12; -fx-padding: 8 25; -fx-background-color: #FF9800; -fx-text-fill: white;");
 		updateBtn.setOnAction(e -> {
-		    if (delivery != null) {
-		        String currentStatus = delivery.getStatus();
-		        String newStatus;
-
-		        if ("pending".equals(currentStatus)) {
-		            newStatus = "in progress";
-		        } else if ("in progress".equals(currentStatus)) {
-		            newStatus = "delivered";
-		        } else {
-		            showAlert("Info", "Pengiriman sudah delivered, tidak bisa di-update lagi.");
-		            return;
-		        }
-
-		        String result = dc.updateDeliveryStatus(deliveryId, newStatus);
-		        if ("success".equals(result)) {
-		            showAlert("Sukses", "Status pengiriman diperbarui menjadi " + newStatus);
-		            delivery.setStatus(newStatus);
-		            statusTF.setText(newStatus);
-		        } else {
-		            showAlert("Error", "Gagal update status: " + result);
-		        }
-		    }
+			if (delivery != null) {
+				showUpdateStatusAlert();
+			}
 		});
 
 		
@@ -160,6 +148,65 @@ public class CourierDetailView {
 		statusTF.setText(delivery != null ? delivery.getStatus() : "");
 	}
 
+	
+	// Method buat nunjukkin pop-up pas mo edit status
+	private void showUpdateStatusAlert() {
+		Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+		alert.setTitle("Update Status");
+		alert.setHeaderText("Update Delivery Status");
+		
+		// Create ComboBox with status options
+		ComboBox<String> statusComboBox = new ComboBox<>();
+		statusComboBox.getItems().addAll("pending", "in progress", "delivered");
+		statusComboBox.setValue(delivery.getStatus()); // Set current status as default
+		statusComboBox.setPrefWidth(200);
+		
+		// Create layout for the dialog content
+		VBox dialogContent = new VBox(10);
+		dialogContent.setPadding(new Insets(10));
+		dialogContent.getChildren().addAll(
+			new Label("Delivery ID: " + delivery.getIdDelivery()),
+			new Label("Order ID: " + delivery.getIdOrder()),
+			new Label("Current Status: " + delivery.getStatus()),
+			new Label("Select New Status:"),
+			statusComboBox
+		);
+		
+		alert.getDialogPane().setContent(dialogContent);
+		
+		ButtonType updateButton = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
+		ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+		alert.getButtonTypes().setAll(updateButton, cancelButton);
+		
+		ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
+		if (result == updateButton) {
+			String newStatus = statusComboBox.getValue();
+			
+			if (newStatus != null && !newStatus.isEmpty()) {
+				String deliveryUpdateResult = dc.updateDeliveryStatus(delivery.getIdDelivery(), newStatus);
+				
+				if ("success".equals(deliveryUpdateResult)) {
+					String orderUpdateResult = oc.editOrderHeaderStatus(delivery.getIdOrder(), newStatus);
+					
+					if ("success".equals(orderUpdateResult)) {
+						delivery.setStatus(newStatus);
+						statusTF.setText(newStatus);
+						showAlert("Sukses", "Status pengiriman dan order diperbarui menjadi " + newStatus);
+					} else {
+						delivery.setStatus(newStatus);
+						statusTF.setText(newStatus);
+						showAlert("Warning", "Status pengiriman berhasil diperbarui, tetapi gagal update status order: " + orderUpdateResult);
+					}
+				} else {
+					showAlert("Error", "Gagal update status pengiriman: " + deliveryUpdateResult);
+				}
+			} else {
+				showAlert("Warning", "Please select a status from the dropdown.");
+			}
+		}
+	}
+
 	/**
 	 * Load Data
 	 */
@@ -176,7 +223,9 @@ public class CourierDetailView {
 		alert.setContentText(message);
 		alert.showAndWait();
 	}
-
+	
+	
+	
 	// Getter and Setter
 	public Scene getScene() {
 		return scene;
